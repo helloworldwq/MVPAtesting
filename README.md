@@ -14,6 +14,3 @@ Below you will also see directions that will allows you run standalone versions 
 - Tsd2008
 - Tsd2013 
 - The FuA calculation 
-
-    pseudocode : 
-    x = 1 
