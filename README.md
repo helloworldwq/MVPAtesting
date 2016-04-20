@@ -14,3 +14,9 @@ Below you will also see directions that will allows you run standalone versions 
 - Tsd2008
 - Tsd2013 
 - The FuA calculation 
+
+Downloading the data and directory structure: 
+- This code relies on the following data set from open-fmri. 
+- It also relies on the following directory structure:
+![Image of Dir Structure](/images/dirstruct.jpg?raw=true "Dir Structure For Project")
+
