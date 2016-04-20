@@ -6,4 +6,7 @@ function MAIN()
 
 setting_up() % add spm path, download data set, create folder structure, unzip data
 pre_process_and_estimate_betas() % pre process SPM data - this is mainly using modifed code punlished here: https://openfmri.org/dataset/ds000158/ (under 'workflow'); 
+run_multi_t_non_directional(); % T 2013
+run_multi_t_directional(); % T 2008
+run_FuA_analysis(); % run FuA analysis 
 end
