@@ -32,3 +32,12 @@ A toy data set is genearted on the fly so that you can see how the core function
 - You can see code for this here [LINK]
 - Here are the results of running that code [LINK] 
 
+Multi-T and FuA in additional languages: 
+--------------
+The core functions we developed were also poreted to work with:
+- Python
+- R 
+See here [LINK]. 
+
+
+
