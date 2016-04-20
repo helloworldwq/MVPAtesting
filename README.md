@@ -15,8 +15,11 @@ Below you will also see directions that will allows you run standalone versions 
 - Tsd2013 
 - The FuA calculation 
 
+Getting the data set
+--------------
+
 Downloading the data and directory structure: 
-- This code relies on the following data set from open-fmri. 
+- This code relies on the following data set from [Open-fMRI](https://openfmri.org/dataset/ds000158/ "Data Used For Project")
+..* Please download both part1 and part 2 and extract into "raw"
 - It also relies on the following directory structure:
 ![Image of Dir Structure](/images/dirstruct.jpg?raw=true "Dir Structure For Project")
-
