@@ -19,6 +19,16 @@ Getting the data set
 --------------
 
 Downloading the data and directory structure: 
-- This code relies on the following data set from [Open-fMRI](https://openfmri.org/dataset/ds000158/ "Data Used For Project"). Please download both Part1 and Part2 into "raw" folder (do not unzip).
-- It also relies on the following directory structure:
+- This code relies on the following data set from [Open-fMRI](https://openfmri.org/dataset/ds000158/ "Data Used For Project").
+- Code should auto-download and create structure below (in case you want to adapt code for your own use case):
 ![Image of Dir Structure](/images/dirstruct.jpg?raw=true "Dir Structure For Project")
+- Runing 'MAIN.m' should perform all the analysis that appear in the paper and generate the main Figures. 
+- Visualizations for paper were made using Brain Voyager, but code also save results and .nii 
+- Raw activation maps from the paper can be found on Neurovault. 
+
+Toy Data Set
+--------------
+A toy data set is genearted on the fly so that you can see how the core functions (Multi-T and FuA) operate. 
+- You can see code for this here [LINK]
+- Here are the results of running that code [LINK] 
+
