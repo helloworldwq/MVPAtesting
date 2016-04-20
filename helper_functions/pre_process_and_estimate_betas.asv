@@ -1,0 +1,18 @@
+function pre_process_and_estimate_betas()
+% note that this code may take a very long time to run (esp on 150
+% subjects). 
+fprintf('------------------------------------------------------------\n');
+fprintf('Pre-processing:\n');
+fprintf('------------------------------------------------------------\n');
+fprintf('- This may take a long time to run. \n');
+fprintf('- It is best to first run pre-process step with stats commented out (this take a long time). \n');
+fprintf('- Then, you can run the states part. \n');
+fprintf('- By default, code is set up to work, so it runs sequntially. This may take a full week. \n');
+fprintf('- If you have access to a server (running linux) code can run one matlab process on each core, employing masive parallel processing.  \n');
+fprintf('- For details re turning on parallel code open "runPreprocessJob.m" .  \n');
+user_response = input('---- Do you want to: [1] pre process data [2] ');
+if strcmp(user_response,'y')
+else 
+    error('user does not want to download files');
+end
+end
