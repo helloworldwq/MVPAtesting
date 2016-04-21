@@ -4,8 +4,8 @@ p = genpath(pwd);
 addpath(p); 
 % print startup information to screen: 
 startup_text()
-% find SPM install 
-get_spm_install_location() 
+% find SPM and neroelf install 
+get_spm_and_neuroelf_install_location() 
 % set up project folder structure 
 makeDirStructure()
 % download data from open fMRI 

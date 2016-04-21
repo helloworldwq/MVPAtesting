@@ -11,7 +11,7 @@ fprintf('- By default, code is set up to work, so it runs sequntially. This may 
 fprintf('- If you have access to a server (running linux) code can run one matlab process on each core, employing masive parallel processing.  \n');
 fprintf('- Using this method, and with 120 cores, running preprocessing and AR(3) model estimation takes ~24 hours. \n');
 fprintf('- For details re turning on parallel code open "runPreprocessJob.m" .  \n');
-user_response = input('---- Do you want to: [1] pre process data [2] alredy preprocessed data, just estimate beta values');
+user_response = input('---- Do you want to:\n [1] pre process data, or:\n [2] alredy preprocessed data, just estimate beta values\n');
 switch user_response
     case 1 % preprocess data 
         runPreprocessJob(1)

@@ -1,4 +1,11 @@
-function 	First_level_block_analysis(subject,script_folder,gp_folder)
+function 	First_level_block_analysis(subject,script_folder)
+% This code is adapted from code found at: 
+% openfmri.org/dataset/ds000158/ 
+% under "workflow" 
+% I kept preprocessing steps the same
+% However, I changed the "stats" part (this is in a seperate file: 
+% First_level_block_analysis_stats_only_ar3.m
+% Contact roeegilron@gmail.com for any questions 
 
 % 1st level block design analysis
 % takes as input the list of subjects directories (subject as cell)
@@ -25,7 +32,7 @@ spm_jobman('initcfg')
 for s=1: size(subject,2)
     cd(subject{s});
     fprintf('processing_subject %g \n %s \n',s,subject{s});   
-    load([script_folder filesep 'pre_process1.mat'])    
+    load(fullfile(script_folder,'helper_functions', 'pre_process1.mat'));    
     
     % 0. ensure the origin is at the right place
     % -----------------------------------------------
@@ -106,76 +113,6 @@ for s=1: size(subject,2)
     spmup_first_level_qa(T1_name,Images',flags); 
     
     return 
-    % 3. stats + contrasts
-    % ---------------------
-    cd(subject{s}); cd('func'); 
-    load([script_folder filesep  'stats1.mat'])
-    matlabbatch{1}.spm.stats.fmri_spec.sess.scans = Images'; % could optionally add ,1
-    matlabbatch{1}.spm.stats.fmri_spec.sess.multi_reg = {[pwd filesep 'multiple_regressors.txt']};
-    mkdir('stats'); cd('stats');
-    matlabbatch{1}.spm.stats.fmri_spec.dir = {pwd};
-    
-    % matlabbatch{2}.spm.stats.fmri_est % <-- dependencies
-    % matlabbatch{3}.spm.stats.con % <-- dependencies
-    
-    cd(subject{s}); save stats matlabbatch;
-    spm_jobman('run', [pwd filesep 'stats.mat']);
-    clear I Images matlabbatch 
-    
-    % 4. threshold voice>non-voice using Gamma-Gaussian Mixture model
-    % (move to dedicated folder)
-    % ----------------------------------------------------------------
-    cd('func/stats');
-    [~,name]=fileparts(subject{s});
-    mask_filename = [pwd filesep 'mask.nii'];
-    spm_mat_file  = [pwd filesep 'SPM.mat'];
-    
-    for con_index = 1:3
-        stat_filename = [pwd filesep 'spmT_000' num2str(con_index) '.nii'];
-        adaptive_thresholding(stat_filename, mask_filename, spm_mat_file, con_index) 
-        try
-            copyfile([pwd filesep 'spmT_000' num2str(con_index) '_thr.nii'],[gp_folder filesep 'single_subjects_maps' filesep name '_spmT_000' num2str(con_index) '_thr.nii']);
-        end
-        if con_index == 3 % also keep the histograms but just for the contrast of intertest
-            saveas(gcf,['GGMM_' num2str(con_index) '.eps'],'psc2'); 
-            copyfile(['GGMM_' num2str(con_index) '.eps'],[gp_folder filesep 'single_subjects_maps' filesep name '_GGMM_' num2str(con_index) '.eps']);
-        end
-        close(gcf);
-    end
-      
-    
-    % 5. Data cleanup (saves space)
-    % ---------------
-    cd ..
-    EPI_data = dir('sub*.nii');
-    for n=1:size(EPI_data,1)
-        data{n}= [pwd filesep EPI_data(n).name];
-    end
-    gzip(data,'raw_data')
-    for n=1:size(EPI_data,1)
-        delete(data{n})
-    end
-    clear data
-        
-    EPI_data=dir('asub*.nii');
-     for n=1:size(EPI_data,1)
-        data{n}= [pwd filesep EPI_data(n).name];
-    end
-    gzip(data,'realigned_data')
-    for n=1:size(EPI_data,1)
-        delete(data{n})
-    end
-    clear data
-    
-    EPI_data=dir('wasub*.nii');
-    for n=1:size(EPI_data,1)
-        data{n}= [pwd filesep EPI_data(n).name];
-    end
-    zip('normalized_data',data)
-    for n=1:size(EPI_data,1)
-        delete(data{n})
-    end    
-    clear data
     
 end
 
