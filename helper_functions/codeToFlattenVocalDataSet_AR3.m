@@ -4,19 +4,14 @@ function codeToFlattenVocalDataSet_AR3()
 % Output: .mat files that flattens .nii to 2D matrices 
 % Uses  : Precomputed group mask file. 
 
-path2add = genpath('/home/rack-hezi-03/home/roigilro/dataForAnalysis/PoldrackRFX_Ttest/NeuroElf_v10_5153');
-addpath(path2add);
-dirStatsReasults = '/home/hezi/roee/vocalDataSet/extractedDataVocalDataSet/';
-statsResultsFodlers = ...
-    {'stats','stats_normalized_only','stats_normalized_sep_beta','stats_smoothed_sep_beta'};
-matFilesDir = '/home/rack-hezi-01/home/roigilro/data/vocal_data_set/';
+
 
 %% loop on subjects
-load(fullfile(...
-    matFilesDir,'groupMaskFromRFXvocalDataSet.mat'))
-
+load(fullfile('helper_functions','groupMaskFromRFXvocalDataSet.mat'))
+dirStatsReasults = fullfile('..','results','raw_beta_vals_2d_FIR_AR3');
+mkdir(dirStatsReasults); 
 n =  neuroelf;
-subFolders = findFilesBVQX(dirStatsReasults,'sub*',struct('dirs',1,'depth',1));
+subFolders = findFilesBVQX(fullfile('..','data'),'sub*',struct('dirs',1,'depth',1));
 cnt =1;
 for i = 1:length(subFolders)
     findar3fold = findFilesBVQX(subFolders{i},'stats_normalized_sep_beta_FIR_ar3',...
@@ -46,7 +41,7 @@ if ~isempty(findar3fold)
                 labels(k) = 2;
             end
         end
-        matFileToSave = fullfile(dirStatsReasults,'stats_normalized_sep_beta_FIR_ar3',...
+        matFileToSave = fullfile(dirStatsReasults,...
             ['data_' subStr{1} '.mat']);
         save(matFileToSave,'data','locations','mask','labels','rawLabel');
         fprintf('%d. %s done in %f\n',cnt,subStr{1},toc(start));
