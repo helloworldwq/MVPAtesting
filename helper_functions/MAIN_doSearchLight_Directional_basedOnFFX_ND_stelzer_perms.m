@@ -44,7 +44,7 @@ for i = 1:length(subsToExtract) % loop on fold 20 / 150 subjects
             [ansMat(j,k,:) ] = calcTstatAll([],deltabeam);
         end
         clc
-        timeVec(k) = toc(start); reportProgress(fnTosave,k,params, slsize, timeVec);
+        timeVec(k) = toc(start); reportProgress(fnTosave,k,params, timeVec);
     end
     
     pval = calcPvalVoxelWise(squeeze(ansMat(:,:,1)));
