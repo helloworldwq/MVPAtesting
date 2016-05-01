@@ -32,6 +32,9 @@ for i = 1:(params.numShuffels + 1) % loop on shuffels
         dataX = data(idxX,idxsout{j,1});
         dataY = data(idxY,idxsout{j,1});
         [ansMat(j,i,:) ] = calcTstatMuniMengTwoGroup(dataX,dataY);
+        if isnan(ansMat(j,i,:))
+            x=2;
+        end
     end
     timeVec(i) = toc(start); reportProgress(fnTosave,i,params, timeVec);
 end
