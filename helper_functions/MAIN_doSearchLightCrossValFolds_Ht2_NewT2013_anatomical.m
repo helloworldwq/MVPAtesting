@@ -13,7 +13,7 @@ resultsDirName = fullfile(resultsdir,sprintf('results_VocalDataSet_anatomical_FF
 mkdir(resultsDirName);
 % pre compute values 
 start = tic;
-% load anatomcal idxs 
+% load anatomcal idxs  
 load('idxs_from_havard_cambridge_atlas.mat'); 
 idx = knnsearch(locations, locations, 'K', params.regionSize); % find searchlight neighbours 
 shufMatrix = createShuffMatrixFFX(data,params);
