@@ -29,8 +29,8 @@ for i = 1:(params.numShuffels + 1) % loop on shuffels
     idxX = find(labelsuse==1);
 	idxY = find(labelsuse==2);
     for j=1:size(idxsout,1) % loop on voxels 
-        dataX = data(idxX,idxsout{j,1});
-        dataY = data(idxY,idxsout{j,1});
+        dataX = removezeros( data(idxX,idxsout{j,1}) );
+        dataY = removezeros( data(idxY,idxsout{j,1}) );
         [ansMat(j,i,:) ] = calcTstatMuniMengTwoGroup(dataX,dataY);
         if isnan(ansMat(j,i,:))
             x=2;
