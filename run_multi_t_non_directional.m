@@ -17,7 +17,7 @@ runSequential = false;
 s150 = subsUsedGet(150);
 s20 = subsUsedGet(20);
 substorun = sort(setdiff(s150,s20));
-substorun = s20; 
+substorun = unique([s20,s150]); 
 startmatlab = 'matlabr2015a -nodisplay -nojvm -r '; % matlab version used to run in parallel
 for i = 1:length(substorun)
     if runSequential

@@ -6,10 +6,13 @@ p = genpath('D:\Roee_Main_Folder\1_AnalysisFiles\Poldrack_RFX\toolboxes\NE_5153'
 addpath(p); 
 
 % load matfile with pvalues: 
-fn_pvals = 'allPvals_FIR_ar3_150subs.mat';
-resultsdir = 'results_VocalDataSet_FFX_ND_FIR_AR3_400-shuf_SL-27'; 
-fullpathresultsdir = fullfile('..','results',resultsdir);
-load(fullfile('..','results',resultsdir,fn_pvals));
+% fn_pvals = 'allPvals_FIR_ar3_150subs.mat';
+% resultsdir = 'results_VocalDataSet_FFX_ND_FIR_AR3_400-shuf_SL-27'; 
+% fullpathresultsdir = fullfile('..','results',resultsdir);
+% load(fullfile('..','results',resultsdir,fn_pvals));
+
+resultsdir = fullfile('..','..','results','results_VocalDataSet_anatomical_FFX_ND_norm_100-shuf');
+load(fullfile(resultsdir,'allPvals_anatomical_153subs.mat')); 
 
 % get real values second level 
 % ff = findFilesBVQX(analysisfolder,'ND*.mat');
@@ -23,7 +26,7 @@ load(fullfile('..','results',resultsdir,fn_pvals));
 %     histogram(allPvals(:,i));
 % end
 % allPvals = allPvals(:,randSubs);
-uval = 0.1; 
+uval = 0.125; 
 
 n = size(allpvals,2); 
 u = floor(uval *n);

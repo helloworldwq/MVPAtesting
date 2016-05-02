@@ -21,7 +21,7 @@ startmatlab = 'matlabr2015a -nodisplay -nojvm -r '; % matlab version used to run
 for i = 1:length(substorun)
     if runSequential
         subnum = substorun(i);
-        runprogram  = sprintf('"run MAIN_doSearchLightCrossValFolds_Ht2_NewT2013_subproc(%d); exit;" ',subnum);
+        runprogram  = sprintf('"run MAIN_doSearchLightCrossValFolds_Ht2_NewT2013_anatomical(%d); exit;" ',subnum);
         pause(0.1);
         unix([startmatlab  runprogram ' &'])
     else

@@ -57,4 +57,7 @@ switch mode
         end
     case 'equal-min'
         fixedAnsMat(idxnan(:,1),:) = min(ansMat(:)); % this also creates the same val for all shufs
+    case 'anatomical'
+        fixedAnsMat = ansMat; 
+        fixedAnsMat(isnan(ansMat)) = min(ansMat(:));
 end
