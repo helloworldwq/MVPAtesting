@@ -1,5 +1,7 @@
 function MAIN_doSearchLightCrossValFolds_Ht2_NewT2013_subproc(subnum)
 % get params 
+p = genpath(pwd);
+addpath(p); 
 params = get_and_set_params();
 % load data / file naming / saving 
 datadir = fullfile('..','data','stats_normalized_sep_beta_FIR_ar6'); 
