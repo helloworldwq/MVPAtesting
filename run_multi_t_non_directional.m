@@ -21,7 +21,7 @@ s20 = subsUsedGet(20);
 substorun = sort(setdiff(s150,s20));
 substorun = unique([s20,s150]); 
 startmatlab = 'matlabr2015a -nodisplay -nojvm -singleCompThread -r '; % matlab version used to run in parallel
-for i = 1:40%length(substorun)
+for i = 41:80%length(substorun)
     if isunix 
         subnum = substorun(i);
         runprogram  = sprintf('"run MAIN_doSearchLightCrossValFolds_Ht2_NewT2013_subproc(%d); exit;" ',subnum);
