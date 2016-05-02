@@ -2,13 +2,13 @@ function MAIN_doSearchLightCrossValFolds_Ht2_NewT2013_subproc(subnum)
 % get params 
 params = get_and_set_params();
 % load data / file naming / saving 
-datadir = fullfile('..','results','raw_beta_vals_2d_FIR_AR3'); 
+datadir = fullfile('..','results','stats_normalized_sep_beta_FIR_ar6'); 
 fn = sprintf('data_%.3d.mat',subnum);
 load(fullfile(datadir,fn));
 fnTosave = sprintf('results_VocalDataSet_FFX_ND_norm_%d-shuf_SLsize-%d_sub_-%.3d_',...
                     params.numShuffels,params.regionSize,subnum);
 resultsdir = fullfile('..','results'); 
-resultsDirName = fullfile(resultsdir,sprintf('results_VocalDataSet_FFX_ND_norm_%d-shuf_SLsize-%d',...
+resultsDirName = fullfile(resultsdir,sprintf('results_VocalDataSet_FIR_AR6_FFX_ND_norm_%d-shuf_SLsize-%d',...
                             params.numShuffels,params.regionSize));
 mkdir(resultsDirName);
 % pre compute values 

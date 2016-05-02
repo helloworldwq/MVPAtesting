@@ -1,7 +1,7 @@
 function params = get_and_set_params()
 % This code gets and sets number of shuffels / sl size 
-params.numShuffels = 100;
-params.regionSize  = 9;
+params.numShuffels = 400;
+params.regionSize  = 27;
 
 fprintf('Params being used are\n:') ;
 fprintf('-- number of shuffles = %d\n',params.numShuffels);
