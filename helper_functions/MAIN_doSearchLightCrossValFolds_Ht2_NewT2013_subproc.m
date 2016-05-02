@@ -4,7 +4,7 @@ p = genpath(pwd);
 addpath(p); 
 params = get_and_set_params();
 % load data / file naming / saving 
-datadir = fullfile('..','data','stats_normalized_sep_beta_FIR_ar6'); 
+datadir = fullfile('..','..','data','stats_normalized_sep_beta_FIR_ar6'); 
 fn = sprintf('data_%.3d.mat',subnum);
 load(fullfile(datadir,fn));
 fnTosave = sprintf('results_VocalDataSet_FFX_ND_norm_%d-shuf_SLsize-%d_sub_-%.3d_',...
