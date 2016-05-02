@@ -13,6 +13,8 @@ function run_multi_t_non_directional()
 %% first level 
 print_start_message_non_directional_analysis()
 runSequential = false;
+p = genpath(pwd); 
+addpath(p); 
 
 s150 = subsUsedGet(150);
 s20 = subsUsedGet(20);
