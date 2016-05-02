@@ -26,7 +26,7 @@ for i = 1:40%length(substorun)
         subnum = substorun(i);
         runprogram  = sprintf('"run MAIN_doSearchLightCrossValFolds_Ht2_NewT2013_subproc(%d); exit;" ',subnum);
         pause(0.1);
-        unix([startmatlab  runprogram ' '])
+        unix([startmatlab  runprogram ' &'])
     else
         MAIN_doSearchLightCrossValFolds_Ht2_NewT2013_subproc(substorun(i));
     end
