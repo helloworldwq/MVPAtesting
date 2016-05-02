@@ -4,28 +4,25 @@ p = genpath(pwd);
 addpath(p); 
 p = genpath('D:\Roee_Main_Folder\1_AnalysisFiles\Poldrack_RFX\toolboxes\NE_5153'); 
 addpath(p); 
+ARorder = 6; 
+switch ARorder
+    case 3
+        resultsfold = 'results_VocalDataSet_anatomical_AR3_FFX_ND_norm_100-shuf';
+    case 6
+        resultsfold = 'results_VocalDataSet_anatomical_AR6_FFX_ND_norm_100-shuf';
+end
+resultsdir = fullfile('..','..','results',resultsfold);
+figfold    = fullfile('..','..','figures',resultsfold);
+mkdir(figfold); 
 
-resultsdir = fullfile('..','..','results','results_VocalDataSet_anatomical_AR6_FFX_ND_norm_100-shuf');
 load('idxs_from_havard_cambridge_atlas.mat'); 
-load(fullfile(resultsdir,'allPvals_FIR_ar6_150subs.mat')); 
+ff = findFilesBVQX(resultsdir,'allPvals*.mat');
+load(ff{1}); 
 
 uval = 0.3; 
+Ps = calc_ruti_prevelance(allpvals,uval); 
+plot_ruti_pvals(Ps,allpvals,uval,figfold,ARorder); 
 
-n = size(allpvals,2); 
-u = floor(uval *n);
-df = 2 * (n-u+1);
-
-% sum of pvals. 
-Ps = [];
-for i = 1:size(allpvals,1)
-    pvals = allpvals(i,:);
-    sortpvals = sort(pvals);
-    upvals = sortpvals(u:end);
-    upvalslog = log(upvals) * (-2);
-    sumus = sum(upvalslog);
-    Ps(i) = chi2cdf(sumus,df,'upper');
-end
-sigfdr = fdr_bh(Ps,0.05,'pdep','yes');
 %% plot vmp 
 mapcnt = 1; 
 rawvmp = get_raw_vmp();
