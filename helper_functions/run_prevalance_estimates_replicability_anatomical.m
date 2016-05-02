@@ -19,9 +19,10 @@ load('idxs_from_havard_cambridge_atlas.mat');
 ff = findFilesBVQX(resultsdir,'allPvals*.mat');
 load(ff{1}); 
 
-uval = 0.3; 
+uval = 0.40; 
 Ps = calc_ruti_prevelance(allpvals,uval); 
-plot_ruti_pvals(Ps,allpvals,uval,figfold,ARorder); 
+sigfdr = fdr_bh(Ps,0.05,'pdep','yes');
+plot_ruti_pvals(Ps,allpvals,uval,figfold,ARorder,idxslabelsout); 
 
 %% plot vmp 
 mapcnt = 1; 
