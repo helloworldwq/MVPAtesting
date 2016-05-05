@@ -26,7 +26,7 @@ load(fullfile(resultsdir,'allPvals_anatomical_153subs.mat'));
 %     histogram(allPvals(:,i));
 % end
 % allPvals = allPvals(:,randSubs);
-uval = 0.125; 
+uval = 0.05; 
 
 n = size(allpvals,2); 
 u = floor(uval *n);
