@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>simple_example</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-05-16"><meta name="DC.source" content="simple_example.m"><style type="text/css">
+      --><title>Simple Example</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-05-16"><meta name="DC.source" content="simple_example.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,10 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Demo Example %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</a></li><li><a href="#3">Create Toy Data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</a></li><li><a href="#4">Compute Non-directional analysis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%</a></li><li><a href="#5">Compute Directional analysis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</a></li><li><a href="#6">Compute FuA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> simple_example()
-</pre><h2>Demo Example %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%<a name="2"></a></h2><pre>This example creates a toy data set to better understand
-How T2013 and T2008 work.
-For details see https://arxiv.org/abs/1605.03482</pre><pre class="codeinput">params.numsubs    = 20;  <span class="comment">% number of subjects</span>
+  </style></head><body><div class="content"><h1>Simple Example</h1><!--introduction--><p>This example creates a toy data set to better understand How T2013 and T2008 work. For details see <a href="https://arxiv.org/abs/1605.03482">here</a>.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Create Simulated Data</a></li><li><a href="#3">Compute Non-directional analysis</a></li><li><a href="#4">Compute Directional analysis</a></li><li><a href="#5">Compute FuA</a></li></ul></div><pre class="codeinput">params.numsubs    = 20;  <span class="comment">% number of subjects</span>
 params.numtrials  = 40;  <span class="comment">% number of trials</span>
 params.sphrsize   = 27;  <span class="comment">% sphere size</span>
 params.effectsize = 0.1; <span class="comment">% effect size</span>
@@ -77,8 +74,9 @@ params.signalper  = 0.2; <span class="comment">% percent voxels with signal</spa
 params.numshufs   = 5e2; <span class="comment">% num of non paramteric shuffels</span>
 params.mu         = 0;   <span class="comment">% for simulating data</span>
 params.sigma      = 0.2; <span class="comment">% for simulating data</span>
-<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
-</pre><h2>Create Toy Data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%<a name="3"></a></h2><p>simulate one "searchlight" or ROI per subject, with dimensions: (Trials x Voxels x Subjects);</p><pre class="codeinput">labels = [ones(params.numtrials/2,1).*1'; ones(params.numtrials/2,1).*2'];
+</pre><h2>Create Simulated Data<a name="2"></a></h2><pre class="codeinput"><span class="comment">% simulate one "searchlight" or ROI per subject, with dimensions:</span>
+<span class="comment">% (Trials x Voxels x Subjects);</span>
+labels = [ones(params.numtrials/2,1).*1'; ones(params.numtrials/2,1).*2'];
 <span class="keyword">for</span> i = 1:params.numsubs; <span class="comment">% simulate data for each subject</span>
     rng(i);
     data(:,:,i) = normrnd(params.mu,params.sigma,params.numtrials,params.sphrsize);
@@ -86,8 +84,17 @@ params.sigma      = 0.2; <span class="comment">% for simulating data</span>
     idxsignal = randperm(params.sphrsize,floor(params.signalper*params.sphrsize));
     data(labels==1,idxsignal,i) = data(labels==1,idxsignal,i) + params.effectsize;
 <span class="keyword">end</span>
-<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
-</pre><h2>Compute Non-directional analysis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%<a name="4"></a></h2><p>a non-directional analysis assumes each subject has a different pattern of results. loop on each subject to compute multi-t 2013 first level:</p><pre class="codeinput"><span class="keyword">for</span> i = 1:params.numsubs <span class="comment">% loops on subs</span>
+fprintf(<span class="string">'simulated data has dimensions:\n'</span>)
+fprintf(<span class="string">'Trials = %d, Voxels = %d, Subjects = %d\n'</span>,<span class="keyword">...</span>
+            size(data,1),size(data,2),size(data,3));
+</pre><pre class="codeoutput">simulated data has dimensions:
+Trials = 40, Voxels = 27, Subjects = 20
+</pre><h2>Compute Non-directional analysis<a name="3"></a></h2><pre class="codeinput"><span class="comment">% a non-directional analysis assumes each subject has a different pattern</span>
+<span class="comment">% of results.</span>
+
+<span class="comment">% first level:</span>
+<span class="comment">% loop on each subject to compute multi-t 2013</span>
+<span class="keyword">for</span> i = 1:params.numsubs <span class="comment">% loops on subs</span>
     <span class="keyword">for</span> j = 1:params.numshufs + 1
         <span class="keyword">if</span> j == 1 <span class="comment">% don't shuffle labels</span>
             labelsuse = labels;
@@ -99,6 +106,7 @@ params.sigma      = 0.2; <span class="comment">% for simulating data</span>
         ansMat(i,j) = calcTstatMuniMengTwoGroup(x,y);
     <span class="keyword">end</span>
 <span class="keyword">end</span>
+
 <span class="comment">% second level</span>
 <span class="comment">% take median from each subject and calc p-value:</span>
 medianAnsMat = median(ansMat,1);
@@ -111,10 +119,16 @@ histogram(medianAnsMat(2:end));
 legend(<span class="string">'non parametric null'</span>);
 scatter(medianAnsMat(1),0, <span class="string">'LineWidth'</span>,5);
 title(<span class="string">'Non parametic null and Non-directional result (red cross)'</span>);
-<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
 </pre><pre class="codeoutput">Pval is 0.002
-</pre><img vspace="5" hspace="5" src="simple_example_01.png" alt=""> <h2>Compute Directional analysis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%<a name="5"></a></h2><p>a directional analysis assumes each subject has a similar pattern of results. compute a directional analysis: first level is simple average:</p><pre class="codeinput">data_averaged = mean(data,3);
-<span class="comment">% second level is T-2008</span>
+</pre><img vspace="5" hspace="5" src="simple_example_01.png" alt=""> <h2>Compute Directional analysis<a name="4"></a></h2><pre class="codeinput"><span class="comment">% a directional analysis assumes each subject has a similar pattern of</span>
+<span class="comment">% results.</span>
+
+<span class="comment">% first level:</span>
+<span class="comment">% simple average the data within each subject:</span>
+data_averaged = mean(data,3);
+
+<span class="comment">% second level</span>
+<span class="comment">% compute directional T-2008 on each subject:</span>
 <span class="keyword">for</span> j = 1:params.numshufs + 1
     <span class="keyword">if</span> j == 1 <span class="comment">% don't shuffle labels</span>
         labelsuse = labels;
@@ -126,34 +140,34 @@ title(<span class="string">'Non parametic null and Non-directional result (red c
     delta = x-y;
     ansMatDirectional(j) = calcTstatDirectional(delta);
 <span class="keyword">end</span>
+
 <span class="comment">%  calc p-value:</span>
 compMatrix = repmat(ansMatDirectional(:,1),1,params.numshufs+1);
 Pval  = mean(compMatrix &lt;=  ansMatDirectional);
 fprintf(<span class="string">'Pval is %.3f\n'</span>,Pval);
+
 <span class="comment">% plot results</span>
 figure; hold <span class="string">on</span>;
 histogram(ansMatDirectional(2:end));
 legend(<span class="string">'non parametric null'</span>);
 scatter(ansMatDirectional(1),0, <span class="string">'LineWidth'</span>,5);
 title(<span class="string">'Non parametic null and Directional result (red cross)'</span>);
-
-<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
 </pre><pre class="codeoutput">Pval is 0.002
-</pre><img vspace="5" hspace="5" src="simple_example_02.png" alt=""> <h2>Compute FuA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%<a name="6"></a></h2><p>FuA computes the degree to which subjects pattern of activity overlaps.</p><pre class="codeinput">x = data_averaged(labels==1,:);
+</pre><img vspace="5" hspace="5" src="simple_example_02.png" alt=""> <h2>Compute FuA<a name="5"></a></h2><p>FuA computes the degree to which subjects pattern of activity overlaps.</p><pre class="codeinput">x = data_averaged(labels==1,:);
 y = data_averaged(labels==2,:);
 delta = x-y;
 FuAval = calcFuA(delta);
 fprintf(<span class="string">'FuA value is %.3f\n'</span>,FuAval);
-<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
 </pre><pre class="codeoutput">FuA value is 0.196
-</pre><pre class="codeinput"><span class="keyword">end</span>
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
-function simple_example()
-%% Demo Example %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  This example creates a toy data set to better understand 
-%  How T2013 and T2008 work. 
-%  For details see https://arxiv.org/abs/1605.03482
+%% Simple Example
+% This example creates a toy data set to better understand 
+% How T2013 and T2008 work. 
+% For details see 
+% <https://arxiv.org/abs/1605.03482 here>. 
+%% 
+
 params.numsubs    = 20;  % number of subjects 
 params.numtrials  = 40;  % number of trials 
 params.sphrsize   = 27;  % sphere size 
@@ -162,9 +176,9 @@ params.signalper  = 0.2; % percent voxels with signal
 params.numshufs   = 5e2; % num of non paramteric shuffels
 params.mu         = 0;   % for simulating data
 params.sigma      = 0.2; % for simulating data
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Create Toy Data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Create Simulated Data 
+
 % simulate one "searchlight" or ROI per subject, with dimensions: 
 % (Trials x Voxels x Subjects); 
 labels = [ones(params.numtrials/2,1).*1'; ones(params.numtrials/2,1).*2'];
@@ -175,13 +189,17 @@ for i = 1:params.numsubs; % simulate data for each subject
     idxsignal = randperm(params.sphrsize,floor(params.signalper*params.sphrsize));
     data(labels==1,idxsignal,i) = data(labels==1,idxsignal,i) + params.effectsize; 
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+fprintf('simulated data has dimensions:\n')
+fprintf('Trials = %d, Voxels = %d, Subjects = %d\n',...
+            size(data,1),size(data,2),size(data,3));
 
-%% Compute Non-directional analysis %%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%% Compute Non-directional analysis
+
 % a non-directional analysis assumes each subject has a different pattern
 % of results. 
-% loop on each subject to compute multi-t 2013 
+
 % first level: 
+% loop on each subject to compute multi-t 2013 
 for i = 1:params.numsubs % loops on subs 
     for j = 1:params.numshufs + 1
         if j == 1 % don't shuffle labels 
@@ -194,6 +212,7 @@ for i = 1:params.numsubs % loops on subs
         ansMat(i,j) = calcTstatMuniMengTwoGroup(x,y);
     end
 end
+
 % second level 
 % take median from each subject and calc p-value: 
 medianAnsMat = median(ansMat,1);
@@ -206,15 +225,18 @@ histogram(medianAnsMat(2:end));
 legend('non parametric null'); 
 scatter(medianAnsMat(1),0, 'LineWidth',5);
 title('Non parametic null and Non-directional result (red cross)'); 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Compute Directional analysis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Compute Directional analysis 
+
 % a directional analysis assumes each subject has a similar pattern of
 % results.
-% compute a directional analysis: 
-% first level is simple average: 
+
+% first level:
+% simple average the data within each subject: 
 data_averaged = mean(data,3); 
-% second level is T-2008 
+
+% second level
+% compute directional T-2008 on each subject:
 for j = 1:params.numshufs + 1
     if j == 1 % don't shuffle labels
         labelsuse = labels;
@@ -226,10 +248,12 @@ for j = 1:params.numshufs + 1
     delta = x-y; 
     ansMatDirectional(j) = calcTstatDirectional(delta);
 end
+
 %  calc p-value: 
 compMatrix = repmat(ansMatDirectional(:,1),1,params.numshufs+1);
 Pval  = mean(compMatrix <=  ansMatDirectional);
 fprintf('Pval is %.3f\n',Pval); 
+
 % plot results 
 figure; hold on; 
 histogram(ansMatDirectional(2:end)); 
@@ -237,20 +261,15 @@ legend('non parametric null');
 scatter(ansMatDirectional(1),0, 'LineWidth',5);
 title('Non parametic null and Directional result (red cross)'); 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% Compute FuA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Compute FuA 
 % FuA computes the degree to which subjects pattern of activity overlaps. 
 x = data_averaged(labels==1,:);
 y = data_averaged(labels==2,:);
 delta = x-y;
 FuAval = calcFuA(delta); 
 fprintf('FuA value is %.3f\n',FuAval); 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
-end
 
 
 ##### SOURCE END #####
