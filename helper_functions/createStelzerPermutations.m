@@ -6,11 +6,11 @@ function [stlzerAnsMat, stlzerPerms] = createStelzerPermutations(ansMat,nummapsc
 if size(ansMat,2) < 2
     error('You do not have any shuffles in this data'); 
 else
-    fprintf('creating %d stlzer shuffels from %d real shufs\n',...
-        nummapscreate,size(ansMat,2));
+%     fprintf('creating %d stlzer shuffels from %d real shufs\n',...
+%         nummapscreate,size(ansMat,2));
 end
 if length(find(isnan(ansMat)==1))
-    error('You have NaNs in your avg ans mat data'); 
+    warning('You have NaNs in your avg ans mat data'); 
 end
 % check that you have shuffels and report what you will do 
 % check that you don't have any nans 
@@ -25,12 +25,16 @@ for j = 1:nummapscreate+1
             for k = 1:numSubs% extract rand map from each sub
                 idxMap = randperm(numrealshufs,1) + 1; % first map is real
                 tmp(:,k) = ansMat(:,idxMap,k);
+                while sum(isnan(tmp(:,k)))~= 0 % choose another map 
+                    idxMap = randperm(numrealshufs,1) + 1; % first map is real
+                    tmp(:,k) = ansMat(:,idxMap,k);
+                end
                 stlzerPerms(k,j) = idxMap;
             end
             stlzerAnsMat(:,j) = avgmap(tmp,avgmode);
         end
         clear tmp;
-        fprintf('finished comp map %d stlzr style\n',j);
+%         fprintf('finished comp map %d stlzr style\n',j);
 end
 end
 

@@ -2,7 +2,7 @@ function MAIN()
 %% Quantifying spatial pattern similarity in multivariate analysis using functional anisotropy
 % if you just want code to see how Multi-T and FuA work on random data so
 % you can quickly apply the functions in your own pipeline 
-% see function - "example_on_toy_data_set.m". 
+% see function - "simple_example.m". 
 % this code runs an a-z version as described in the manuscript but on sample data. 
 % it allows you to examine inputs and outputs to the main functions used
 % while comput

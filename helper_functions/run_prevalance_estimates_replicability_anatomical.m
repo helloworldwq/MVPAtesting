@@ -1,5 +1,6 @@
 function run_prevalance_estimates_replicability_anatomical()
 % needs neureolf: 
+% pvals calcluated with: calcPvalsAllSubs_ar3.m 
 p = genpath(pwd); 
 addpath(p); 
 p = genpath('D:\Roee_Main_Folder\1_AnalysisFiles\Poldrack_RFX\toolboxes\NE_5153'); 

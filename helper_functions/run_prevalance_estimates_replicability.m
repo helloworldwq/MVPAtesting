@@ -11,8 +11,9 @@ addpath(p);
 % fullpathresultsdir = fullfile('..','results',resultsdir);
 % load(fullfile('..','results',resultsdir,fn_pvals));
 
-resultsdir = fullfile('..','..','results','results_VocalDataSet_anatomical_FFX_ND_norm_100-shuf');
-load(fullfile(resultsdir,'allPvals_anatomical_153subs.mat')); 
+resultsdir = fullfile('..','..','results','results_VocalDataSet_FIR_AR6_FFX_ND_norm_400-shuf_SLsize-27');
+ff = findFilesBVQX(resultsdir,'allPvals*.mat'); 
+load(ff{1}); 
 
 % get real values second level 
 % ff = findFilesBVQX(analysisfolder,'ND*.mat');
@@ -26,7 +27,7 @@ load(fullfile(resultsdir,'allPvals_anatomical_153subs.mat'));
 %     histogram(allPvals(:,i));
 % end
 % allPvals = allPvals(:,randSubs);
-uval = 0.05; 
+uval = 0.6; 
 
 n = size(allpvals,2); 
 u = floor(uval *n);

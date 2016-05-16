@@ -3,7 +3,7 @@ function run_multi_t_directional()
 % This function will run directional T-test on all subjects in the
 % data set based. It will use the shuffle matrix from the non-directional
 % analysis.
-% for details re how this analysis is run see paper at XXXX
+% for details re how this analysis is run see paper at https://arxiv.org/abs/1605.03482
 % output of the function is stored in the results folder.
 % these results are later computed into group level .nii maps using
 % function XXX
