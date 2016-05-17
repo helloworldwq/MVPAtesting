@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Simple Example</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-05-16"><meta name="DC.source" content="simple_example.m"><style type="text/css">
+      --><title>Simple Example</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-05-17"><meta name="DC.source" content="simple_example.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -89,8 +89,8 @@ fprintf(<span class="string">'Trials = %d, Voxels = %d, Subjects = %d\n'</span>,
             size(data,1),size(data,2),size(data,3));
 </pre><pre class="codeoutput">simulated data has dimensions:
 Trials = 40, Voxels = 27, Subjects = 20
-</pre><h2>Compute Non-directional analysis<a name="3"></a></h2><pre class="codeinput"><span class="comment">% a non-directional analysis assumes each subject has a different pattern</span>
-<span class="comment">% of results.</span>
+</pre><h2>Compute Non-directional analysis<a name="3"></a></h2><pre class="codeinput"><span class="comment">% A non-directional analysis assumes each subject can have a different pattern</span>
+<span class="comment">% of activity.</span>
 
 <span class="comment">% first level:</span>
 <span class="comment">% loop on each subject to compute multi-t 2013</span>
@@ -120,8 +120,8 @@ legend(<span class="string">'non parametric null'</span>);
 scatter(medianAnsMat(1),0, <span class="string">'LineWidth'</span>,5);
 title(<span class="string">'Non parametic null and Non-directional result (red cross)'</span>);
 </pre><pre class="codeoutput">Pval is 0.002
-</pre><img vspace="5" hspace="5" src="simple_example_01.png" alt=""> <h2>Compute Directional analysis<a name="4"></a></h2><pre class="codeinput"><span class="comment">% a directional analysis assumes each subject has a similar pattern of</span>
-<span class="comment">% results.</span>
+</pre><img vspace="5" hspace="5" src="simple_example_01.png" alt=""> <h2>Compute Directional analysis<a name="4"></a></h2><pre class="codeinput"><span class="comment">% A directional analysis assumes each subject has a similar pattern of</span>
+<span class="comment">% activity.</span>
 
 <span class="comment">% first level:</span>
 <span class="comment">% simple average the data within each subject:</span>
@@ -153,7 +153,7 @@ legend(<span class="string">'non parametric null'</span>);
 scatter(ansMatDirectional(1),0, <span class="string">'LineWidth'</span>,5);
 title(<span class="string">'Non parametic null and Directional result (red cross)'</span>);
 </pre><pre class="codeoutput">Pval is 0.002
-</pre><img vspace="5" hspace="5" src="simple_example_02.png" alt=""> <h2>Compute FuA<a name="5"></a></h2><p>FuA computes the degree to which subjects pattern of activity overlaps.</p><pre class="codeinput">x = data_averaged(labels==1,:);
+</pre><img vspace="5" hspace="5" src="simple_example_02.png" alt=""> <h2>Compute FuA<a name="5"></a></h2><p>FuA computes the degree to which subjects share a similar pattern of activity.</p><pre class="codeinput">x = data_averaged(labels==1,:);
 y = data_averaged(labels==2,:);
 delta = x-y;
 FuAval = calcFuA(delta);
@@ -195,8 +195,8 @@ fprintf('Trials = %d, Voxels = %d, Subjects = %d\n',...
 
 %% Compute Non-directional analysis
 
-% a non-directional analysis assumes each subject has a different pattern
-% of results. 
+% A non-directional analysis assumes each subject can have a different pattern
+% of activity. 
 
 % first level: 
 % loop on each subject to compute multi-t 2013 
@@ -228,8 +228,8 @@ title('Non parametic null and Non-directional result (red cross)');
 
 %% Compute Directional analysis 
 
-% a directional analysis assumes each subject has a similar pattern of
-% results.
+% A directional analysis assumes each subject has a similar pattern of
+% activity.
 
 % first level:
 % simple average the data within each subject: 
@@ -262,7 +262,7 @@ scatter(ansMatDirectional(1),0, 'LineWidth',5);
 title('Non parametic null and Directional result (red cross)'); 
 
 %% Compute FuA 
-% FuA computes the degree to which subjects pattern of activity overlaps. 
+% FuA computes the degree to which subjects share a similar pattern of activity. 
 x = data_averaged(labels==1,:);
 y = data_averaged(labels==2,:);
 delta = x-y;
