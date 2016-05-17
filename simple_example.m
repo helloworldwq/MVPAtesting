@@ -32,8 +32,8 @@ fprintf('Trials = %d, Voxels = %d, Subjects = %d\n',...
 
 %% Compute Non-directional analysis
 
-% a non-directional analysis assumes each subject has a different pattern
-% of results. 
+% A non-directional analysis assumes each subject can have a different pattern
+% of activity. 
 
 % first level: 
 % loop on each subject to compute multi-t 2013 
@@ -65,8 +65,8 @@ title('Non parametic null and Non-directional result (red cross)');
 
 %% Compute Directional analysis 
 
-% a directional analysis assumes each subject has a similar pattern of
-% results.
+% A directional analysis assumes each subject has a similar pattern of
+% activity.
 
 % first level:
 % simple average the data within each subject: 
@@ -99,7 +99,7 @@ scatter(ansMatDirectional(1),0, 'LineWidth',5);
 title('Non parametic null and Directional result (red cross)'); 
 
 %% Compute FuA 
-% FuA computes the degree to which subjects pattern of activity overlaps. 
+% FuA computes the degree to which subjects share a similar pattern of activity. 
 x = data_averaged(labels==1,:);
 y = data_averaged(labels==2,:);
 delta = x-y;
