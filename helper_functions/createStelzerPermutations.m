@@ -11,6 +11,7 @@ else
 end
 if length(find(isnan(ansMat)==1))
     warning('You have NaNs in your avg ans mat data'); 
+    ansMat(isnan(ansMat)) = 0; 
 end
 % check that you have shuffels and report what you will do 
 % check that you don't have any nans 
