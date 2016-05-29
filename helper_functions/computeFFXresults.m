@@ -6,7 +6,7 @@ for i = subsToExtract
     subStrSrc = sprintf('*shuf*%3.3d*.mat',i);
     [firstlevelfold,~] = fileparts(ffxResFold);
     ff = findFilesBVQX(firstlevelfold,subStrSrc);
-    load(ff{1})
+    load(ff{i})
     fprintf('B = sub %d has %d nans\n',i,sum(isnan(median(ansMat,2))))
     modeuse = 'equal-min'; % modes to deal with zeros also 'equal-zero', 'equal-min' and 'weight'
     ansMat = squeeze(ansMat(:,:,1)); % first val is multi t 2013
