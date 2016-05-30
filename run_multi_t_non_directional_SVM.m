@@ -20,11 +20,12 @@ s150 = subsUsedGet(150);
 s20 = subsUsedGet(20);
 substorun = sort(setdiff(s150,s20));
 substorun = unique([s20,s150]); 
+substorun = s20;
 startmatlab = 'matlabr2015a -nodisplay -nojvm -singleCompThread -r '; % matlab version used to run in parallel
-for i = 121:153%length(substorun)
+for i = 1:length(substorun)
     if isunix 
         subnum = substorun(i);
-        runprogram  = sprintf('"run MAIN_doSearchLightCrossValFolds_Ht2_NewT2013_subproc(%d); exit;" ',subnum);
+        runprogram  = sprintf('"run MAIN_doSearchLightCrossValFolds_SVM_subproc(%d); exit;" ',subnum);
         pause(0.1);
         unix([startmatlab  runprogram ' &'])
     else
@@ -33,6 +34,6 @@ for i = 121:153%length(substorun)
 end
 
 %% run second level 
-MAIN_compute_non_directional_second_level() % second level 
+%MAIN_compute_non_directional_second_level() % second level 
 
 end
