@@ -21,8 +21,6 @@ shufMatrix = createShuffMatrixFFX(data,params);
 
 part = getPartition(params,labels);
 
-
-
 %% loop on all voxels in the brain to create T map
 for i = 1:(params.numShuffels + 1) % loop on shuffels
     %don't shuffle first itiration
@@ -50,8 +48,6 @@ for i = 1:(params.numShuffels + 1) % loop on shuffels
             tmp_multit(k,j) = calcTstatMuniMengTwoGroup(x,y);
         end
     end
-    %ansMat_SVM
-    %ansMat_Multit
     ansMat_SVM(:,i)  = mean(tmp,1)'; % voxels x shuffels
     ansMat_Multit(:,i) = mean(tmp_multit,1)'; % voxels x shuffels
     timeVec(i) = toc(start); reportProgress(fnTosave,i,params, timeVec);
