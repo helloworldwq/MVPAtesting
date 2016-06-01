@@ -18,6 +18,30 @@ start = tic;
 idx = knnsearch(locations, locations, 'K', params.regionSize); % find searchlight neighbours 
 shufMatrix = createShuffMatrixFFX(data,params);
 
+% close range 1:8 first fold. 1:16 second fold 
+% long range - 1 9 17 , 2 10, 18 second fold. 
+% create train and test set.
+% random 
+
+% random partition 
+c = cvpartition(labels,'Kfold',params.cvfold_folds);
+for i = 1:length(params.cvfold_folds); 
+    part.training(:,i) = (long_range_part~=i);
+    part.test(:,i)     = (long_range_part==i);
+end
+
+% close  range  
+close_range_part = repmat([ones(1,4)*1,ones(1,4)*2,ones(1,4)*3,ones(1,4)*4,ones(1,4)*5],1,2);
+for i = 1:params.cvfold_folds; 
+    part.training(:,i) = (close_range_part~=i);
+    part.test(:,i)     = (close_range_part==i);
+end
+
+% long range 
+c = cvpartition(repmat(1:5,1,8),'Kfold',params.cvfold_folds);
+
+
+
 %% loop on all voxels in the brain to create T map
 for i = 1:(params.numShuffels + 1) % loop on shuffels 
     %don't shuffle first itiration
@@ -26,8 +50,6 @@ for i = 1:(params.numShuffels + 1) % loop on shuffels
     else % shuffle data
         labelsuse = labels(shufMatrix(:,i-1));
     end
-    % create train and test set. 
-    c = cvpartition(labelsuse,'Kfold',params.cvfold_folds);
     for k = 1:c.NumTestSets
         % train: 
         datatrain = double(data(c.training(k),:));
@@ -42,8 +64,6 @@ for i = 1:(params.numShuffels + 1) % loop on shuffels
             tmp(k,j) = accuracy(1);% folds x voxels 
         end
     end
-    csave(i) = c;
-    c = c.repartition;
     [ansMat(:,i) ] = mean(tmp,1)'; % voxels x shuffels 
     timeVec(i) = toc(start); reportProgress(fnTosave,i,params, timeVec);
 end
