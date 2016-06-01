@@ -3,10 +3,10 @@ cnt = 1;
 %% extract results from each subject
 for i = subsToExtract
     start = tic;
-    subStrSrc = sprintf('*shuf*%3.3d*.mat',i);
+    subStrSrc = sprintf('results_VocalDataSet_FFX_ND_SVM_*shuf*%3.3d*.mat',i);
     [firstlevelfold,~] = fileparts(ffxResFold);
     ff = findFilesBVQX(firstlevelfold,subStrSrc);
-    load(ff{i})
+    load(ff{1})
     fprintf('B = sub %d has %d nans\n',i,sum(isnan(median(ansMat,2))))
     modeuse = 'equal-min'; % modes to deal with zeros also 'equal-zero', 'equal-min' and 'weight'
     ansMat = squeeze(ansMat(:,:,1)); % first val is multi t 2013
