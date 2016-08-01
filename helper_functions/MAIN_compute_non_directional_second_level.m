@@ -17,7 +17,7 @@ mkdir(secondlevelresultsfolder);
 
 subsToExtract = subsUsedGet(20); % 150 / 20 for vocal data set 
 fold = 1; 
-numMaps = 1e3;
-% computeFFXresults(subsToExtract,fold,secondlevelresultsfolder,numMaps)
-computeFFXresults_repart_comp(subsToExtract,fold,secondlevelresultsfolder,numMaps);
+numMaps = 5e3;
+computeFFXresults(subsToExtract,fold,secondlevelresultsfolder,numMaps)
+% computeFFXresults_repart_comp(subsToExtract,fold,secondlevelresultsfolder,numMaps);
 end

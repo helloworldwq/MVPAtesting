@@ -71,7 +71,7 @@ switch params.partmode
         % close  range  1:8 first fold. 1:16 second fold
         close_range_part = repmat([ones(1,4)*1,ones(1,4)*2,ones(1,4)*3,ones(1,4)*4,ones(1,4)*5],1,2);
         for i = 1:params.cvfold_folds;
-            part.training(:,i) = (close_range_part~=i);
+              part.training(:,i) = (close_range_part~=i);
             part.test(:,i)     = (close_range_part==i);
         end
     case 'long'

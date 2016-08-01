@@ -86,9 +86,11 @@ for i = 1:size(data.data,3) % looop on subjects
     else % shuffle data
         labelsuse = data.labels(randperm(length(data.labels)));
     end
+    % labels 1:
     avgdata.data(cnt,:) = double(mean(data.data(labelsuse==1,:,i),1));
     avgdata.labels(cnt) = 1; 
     cnt = cnt + 1; 
+    % labels 2: 
     avgdata.data(cnt,:) = double(mean(data.data(labelsuse==2,:,i),1));
     avgdata.labels(cnt) = 2; 
     cnt = cnt + 1; 

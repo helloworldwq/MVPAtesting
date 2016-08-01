@@ -1,34 +1,39 @@
-function MAIN_doSearchLight_Directional_FFX_SVM()
+function MAIN_doSearchLight_Directional_FFX_SVM_fixed()
 % This function runs FFX directional SVM
 slsize = 27;
 ffxResFold = fullfile('..','..','data','stats_normalized_sep_beta_FIR_ar6');
 resultsDir  = ffxResFold;
-params.numShuffels = 3;
+params.numShuffels = 1e3;
 params.regionSize = slsize;
 params.cvfold_folds = 5 ;
 
-fnTosave = sprintf('results_VocalDataSet_FFX_DR_SVM_%d-shuf_SLsize-%d_folds_-%.3d_.mat',...
+fnTosave = sprintf('results_VocalDataSet_CVonce_FFX_DR_SVM_%d-shuf_SLsize-%d_folds_-%.3d_.mat',...
                     params.numShuffels,params.regionSize,params.cvfold_folds);
 
 
 s20 = subsUsedGet(20);
 substorun = s20;
 start = tic;
-% pool = parpool('local',7);
+%pool = parpool('local',20);
 
 [dataout, labels, locations, mask] = loadData(substorun,ffxResFold); % data out trials x voxels x subjects 
 idx = knnsearch(locations, locations, 'K', slsize);
 
-rng(1); 
-c = cvpartition(length(substorun),'Kfold',params.cvfold_folds); % only create one fold 
+%rng(1); 
+rng('shuffle');
+c = cvpartition(length(substorun),'Kfold',params.cvfold_folds); % partition on every shuffle 
 for k = 1:params.numShuffels + 1  % loop on shuffels
+    rng('shuffle');
+    dataToAvg.data = dataout; 
+    dataToAvg.labels = labels; 
+    [dataoutAvg] = averagAndShuffleData(dataToAvg,k,'labelperms'); 
+    c = cvpartition(length(substorun),'Kfold',params.cvfold_folds); % cvfold for average data - balanced
+
     for f = 1:params.cvfold_folds % loop on fold 
-       [traindata, testdata] = partitionData(dataout,labels,c,f);
-       traindata_avg = averagAndShuffleData(traindata,k);
-       testdata_avg = averagAndShuffleData(testdata,1); % never shuffle test data 
+       [traindata_avg, testdata_avg] = partitionDataAfterAverage(dataoutAvg.data,dataoutAvg.labels,dataoutAvg.subj, c,f);
        for j=1:size(idx,1) % loop onvoxels
            % create train and test set.
-           model = svmtrainwrapper(traindata_avg.labels',traindata_avg.data(:,idx(j,:)) );
+           model = svmtrainwrapper2(traindata_avg.labels',traindata_avg.data(:,idx(j,:)) );
            [predicted_label, accuracy, third] = ...
                svmpredictwrapper(testdata_avg.labels',testdata_avg.data(:,idx(j,:)),model);
            tmp(f,j) = accuracy(1);% folds x voxels
@@ -44,14 +49,14 @@ for k = 1:params.numShuffels + 1  % loop on shuffels
     timeVec(k) = toc(start); reportProgress(fnTosave,k,params, timeVec);
 end
     
-
+kernal_used = 'linear';
 pval_multit = calcPvalVoxelWise(ansMat_Multit);
 pval_svm = calcPvalVoxelWise(ansMat_SVM);
 SigFDR_multit = fdr_bh(pval_multit,0.05,'pdep','no');
 SigFDR_svm = fdr_bh(pval_svm,0.05,'pdep','no');
 subsExtracted = substorun;
 save(fullfile(resultsDir,fnTosave),...
-    'ansMat_SVM','ansMat_Multit','ansMatReal','pval_multit','pval_svm',...
+    'ansMat_SVM','ansMat_Multit','pval_multit','pval_svm',...
     'locations','mask','fnTosave','subsExtracted','SigFDR_multit','SigFDR_svm');
 end
 
@@ -84,6 +89,7 @@ for i = 1:size(data.data,3) % looop on subjects
     if k ==1 % don't shuffle data
         labelsuse = data.labels;
     else % shuffle data
+	rng('shuffle');
         labelsuse = data.labels(randperm(length(data.labels)));
     end
     avgdata.data(cnt,:) = double(mean(data.data(labelsuse==1,:,i),1));
@@ -93,4 +99,19 @@ for i = 1:size(data.data,3) % looop on subjects
     avgdata.labels(cnt) = 2; 
     cnt = cnt + 1; 
 end
+end
+
+function [traindata, testdata] = partitionDataAfterAverage(dataout,labels,subj,c,fold)
+subj_idxs_train = find(c.training(fold) == 1); % get the subject numbers to train  
+idxs_train = find(ismember(subj,subj_idxs_train)==1);
+
+subj_idxs_test = find(c.test(fold) == 1); % get the subject numbers to test  
+idxs_test = find(ismember(subj,subj_idxs_test)==1);
+
+traindata.labels = labels(idxs_train);
+traindata.data = dataout(idxs_train,:);
+
+testdata.labels = labels(idxs_test);
+testdata.data = dataout(idxs_test,:);
+
 end

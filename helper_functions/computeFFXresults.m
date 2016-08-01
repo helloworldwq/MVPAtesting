@@ -3,7 +3,7 @@ cnt = 1;
 %% extract results from each subject
 for i = subsToExtract
     start = tic;
-    subStrSrc = sprintf('results_VocalDataSet_FFX_ND_SVM_*shuf*%3.3d*.mat',i);
+    subStrSrc = sprintf('results_VocalDataSet_FFX_ND_*shuf*%3.3d*.mat',i);
     [firstlevelfold,~] = fileparts(ffxResFold);
     ff = findFilesBVQX(firstlevelfold,subStrSrc);
     load(ff{1})

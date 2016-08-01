@@ -6,7 +6,7 @@ for i = subsToExtract
     subStrSrc = sprintf('results_VocalDataSet_FFX_ND_SVM_*shuf*%3.3d*.mat',i);
     [firstlevelfold,~] = fileparts(ffxResFold);
     ff = findFilesBVQX(firstlevelfold,subStrSrc);
-    load(ff{1},'ansMat_Multit','ansMat_SVM','locations')
+    load(ff{1},'ansMat_Multit','ansMat_SVM','locations','params','mask')
     list = whos('ansMat*'); 
     modeuse = 'equal-min'; % modes to deal with zeros also 'equal-zero', 'equal-min' and 'weight'
     ansMat_Multit_out(:,:,cnt) = fixZerosNans(ansMat_Multit,modeuse,i,locations);

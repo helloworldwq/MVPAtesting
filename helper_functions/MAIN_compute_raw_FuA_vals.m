@@ -1,26 +1,26 @@
-function MAIN_compute_raw_FA_vals()
-% This function creates raw FA vals and makes a VMP out of them.
+function MAIN_compute_raw_FuA_vals()
+% This function creates raw FuA vals and makes a VMP out of them.
 
 subsToExtract = [20,150];
 slsize = 27;
 numshufs = 100;
-ffxResFold = 'F:\vocalDataSet\processedData\matFilesProcessedData\vocalDataSetResults\results_VocalDataSet_FFX_ND_norm_100shuf_SL27_reg_perm_ar3';
-resultsDir  = ffxResFold;
-params = getParams;
+ffxResFold = fullfile('..','..','data','stats_normalized_sep_beta_FIR_ar6');
+resultsDir  = fullfile('..','..','results','results_VocalDataSet_FIR_AR6_FFX_ND_norm_400-shuf_SLsize-27');
+params = get_and_set_params;
 params.numShuffels = numshufs;
 params.regionSize = slsize;
 params.numShuffels = numshufs;
 
 
-subsToExtract = 20;
+subsToExtract = 150;
 for i = 1:length(subsToExtract) % loop on fold 20 / 150 subjects
     substorun = subsUsedGet(subsToExtract(i)); % 150 / 20 for vocal data set
-    timeVec = [];    fnTosave = sprintf('RAW_FA_VALS_ar3_%d-subs_%d-slsize.mat',...
+    timeVec = [];    fnTosave = sprintf('RAW_FA_VALS_ar6_%d-subs_%d-slsize.mat',...
         slsize,subsToExtract(i));
 
     for s = 1:length(substorun) % get data from each subject
         % find the data for this subject:
-        ff = findFilesBVQX(ffxResFold,sprintf('*sub_%.3d*.mat',substorun(s)));
+        ff = findFilesBVQX(ffxResFold,sprintf('*data_%.3d*.mat',substorun(s)));
         load(ff{1},'data','mask','labels','shufMatrix','locations');
         labelsuse = labels; % just real data no shuffle 
         
@@ -34,17 +34,17 @@ for i = 1:length(subsToExtract) % loop on fold 20 / 150 subjects
         deltabeam = delta(:,idx(j,:));
         % delta beam for FA computation should be sphers x subs (hence
         % transpose) 
-        [rawFA(j) ] = calcClumpingIndexSVDNoDemeaning(deltabeam');
+        [rawFA(j) ] = calcClumpingIndexSVD_demeaned(deltabeam');
         [rawFANonCentered(j) ] = calcClumpingIndexSVD(deltabeam');
     end
-    save(fullfile(resultsDir,f  nTosave),...
+    save(fullfile(resultsDir,fnTosave),...
         'rawFA','rawFANonCentered',...
         'locations','mask','fnTosave','substorun');
     % create and save VMP with FA val
     n = neuroelf;
-    vmp = n.importvmpfromspms(fullfile(pwd,'temp.nii'),'a',[],3);
+    vmp = BVQXfile(fullfile(pwd,'blank_MNI_3x3res.vmp'));
     mapstruc = vmp.Map;
-    vmpdat = scoringToMatrix(mask,double(rawFA'),locations); % note that SigFDR must be row vector
+    vmpdat = scoringToMatrix(mask,double(rawFANonCentered'),locations); % note that SigFDR must be row vector
     vmp.Map.VMPData = vmpdat;
     vmp.Map(1).LowerThreshold = min(vmpdat(:));
     vmp.Map(1).UpperThreshold = max(vmpdat(:));

@@ -1,37 +1,32 @@
-function MAIN_doSearchLight_Directional_basedOnFFX_ND_stelzer_perms()
-% This function uses previously run ND-FFX shuf matrices
-% And runs a Directional FFX searchlight
-subsToExtract = [20,150];
+function MAIN_doSearchLight_Directional()
+% This function runs a Directional FFX searchlight 
 slsize = 27;
-[fn,pn] = uigetfile('ND*.mat');
-load(fullfile(pn,fn));
-numshufs = 100;
-numstlzrshufs = size(stlzerPermsAnsMat,2);
-ffxResFold = 'data\stats_normalized_sep_beta_FIR_ar6'
-'F:\vocalDataSet\processedData\matFilesProcessedData\vocalDataSetResults\results_VocalDataSet_FFX_ND_norm_1000shuf_SL27_reg_perm_ar3';
+numshufs = 2;
+ffxResFold = fullfile('..','..','data','stats_normalized_sep_beta_FIR_ar6');
 resultsDir  = ffxResFold;
 params = getParams;
-params.numShuffels = numstlzrshufs-1;
+params.numShuffels = numshufs;
 params.regionSize = slsize;
 
-
+subsToExtract = [20,150];
 subsToExtract = 20;
 start = tic;
 % pool = parpool('local',7);
 for i = 1:length(subsToExtract) % loop on fold 20 / 150 subjects
     substorun = subsUsedGet(subsToExtract(i)); % 150 / 20 for vocal data set
-    fnTosave = ['DR' fn(3:end)];
+    fnTosave = sprintf('results_DR_shufs-%d_subs-%d_slsize-%d.mat', numshufs,subsToExtract(i),slsize) ;
     timeVec = [];
-    for k = 1:numstlzrshufs % loop on shuffels
+    for k = 1:numshufs % loop on shuffels
         for s = 1:length(substorun) % get data from each subject
             % find the data for this subject:
-            ff = findFilesBVQX(ffxResFold,sprintf('*sub_%.3d*.mat',substorun(s)));
-            load(ff{1},'data','mask','labels','shufMatrix','locations');
+            ff = findFilesBVQX(ffxResFold,sprintf('data_%.3d*.mat',substorun(s)));
+            load(ff{1},'data','mask','labels','locations');
             %don't shuffle first itiration
             if k ==1 % don't shuffle data
                 labelsuse = labels;
             else % shuffle data
-                labelsuse = labels(shufMatrix(:,stlzerPermsAnsMat(s,k)-1));
+                rng('shuffle');
+                labelsuse = labels(randperm(length(labels)));
             end
             dataX = mean(data(labelsuse==1,:),1); % mean delta x
             dataY = mean(data(labelsuse==2,:),1); % mean delta y
@@ -42,7 +37,7 @@ for i = 1:length(subsToExtract) % loop on fold 20 / 150 subjects
         idx = knnsearch(locations, locations, 'K', slsize);
         for j=1:size(idx,1) % loop onvoxels
             deltabeam = delta(:,idx(j,:));
-            [ansMat(j,k,:) ] = calcTstatAll([],deltabeam);
+            [ansMat(j,k,:) ] = calcTstatDirectional(deltabeam);
         end
         clc
         timeVec(k) = toc(start); reportProgress(fnTosave,k,params, timeVec);
@@ -56,5 +51,11 @@ for i = 1:length(subsToExtract) % loop on fold 20 / 150 subjects
         'ansMat','ansMatReal','pval',...
         'locations','mask','fnTosave','subsExtracted','SigFDR');
 end
-delete(pool);    
+
+%% push message that finished subject 
+p = Pushbullet('o.6i6t6UA0GYvxXgtKZpVjJUIazDFHeF6e');
+secsjobtook = toc(startjobtime);
+durjob = sprintf('job took: %s',datestr(secsjobtook/86400, 'HH:MM:SS.FFF'));
+p.pushNote([],'Finished Directional ',[fnTosave 'in'  durjob ])
+%% 
 end
