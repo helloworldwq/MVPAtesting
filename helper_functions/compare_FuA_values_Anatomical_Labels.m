@@ -3,14 +3,25 @@ function compare_FuA_values_Anatomical_Labels()
 % add path 
 p = genpath('D:\Roee_Main_Folder\1_AnalysisFiles\Poldrack_RFX\');addpath(p);
 %% load raw FA maps
-filesFA = {'RAW_FA_VALS_ar3_27-subs_20-slsize','RAW_FA_VALS_ar3_27-subs_150-slsize'};
-rootDirOriginalData = 'F:\vocalDataSet\processedData\matFilesProcessedData\stats_normalized_sep_beta_ar3';
+filesFA = {'RAW_FA_VALS_ar6_27-subs_20-slsize','RAW_FA_VALS_ar6_27-subs_150-slsize'};
 numsubstot = [20, 150];
-for ns = 1:2
+slsize = 27; 
+params.measureuse   = 'rawFuA_skewness';% which symmetry measure to use (FuA unit normed, FuA non unit normed, Symmetry, directioanl multi-t)
+% rawFuA_nonNormalized , rawFuA_symmetry, rawFuA_unitNormalized, rawFuA_skewness
+% drrealdata, rawFuA_normdiff_unitnorm, rawFuA_normdiff_nonunitnorm
+for ns = 1
     numsubs= numsubstot(ns);
-    resDir = 'F:\vocalDataSet\processedData\matFilesProcessedData\vocalDataSetResults\results_VocalDataSet_FFX_ND_norm_1000shuf_SL27_reg_perm_ar3';
-    vmpbasefn = filesFA{ns}; % just GM has 1
-    vmp = BVQXfile(fullfile(resDir,[vmpbasefn  '.vmp']));
+    resDir = fullfile('..','..','results',...
+        sprintf('results_VocalDataSet_FIR_AR6_FFX_ND_norm_400-shuf_SLsize-%d',slsize));
+    %load([filesFA{ns} '.mat']);
+    % vmpbasefn = filesFA{ns}; % just GM has 1
+    % vmp = BVQXfile(fullfile(resDir,[vmpbasefn  '.vmp']));
+    %% directional (load dir data 
+    rootDir2ndlvl = fullfile('..','..','results',...
+        sprintf('results_VocalDataSet_FIR_AR6_FFX_ND_norm_400-shuf_SLsize-%d',slsize),...
+        '2nd_level');
+    dirfnm  = sprintf('results_DR_shufs-5000_subs-%d_slsize-%d.mat',numsubstot(ns),slsize);
+    load(fullfile(rootDir2ndlvl,dirfnm),'drrealdata','mask','locations');
     %% load MNI anatomical labels cortical
     rootDir = 'D:\Roee_Main_Folder\1_AnalysisFiles\Poldrack_RFX\matlabCode\atlasLabels';
     vmplabels = 'HarvardCambrdgeCoritcalAtlas'; % just GM has 1
@@ -28,11 +39,21 @@ for ns = 1:2
     areaLegnds = {'H1', 'PT', 'STGp', 'STGa','M1','S1', 'IC', 'OP'};
     areaIdxs = [45 46 10 9 7 17 24 48]; 
     
-    load(fullfile(resDir,'FAepiVsRealin3d.mat'));
-    rawFA = vmp.Map(1).VMPData; % map number 4 is SL size 47
-    rawVals = double(rawFA);
+    %% load FuA values and move to 3d 
+    % RAW_FA_VALS_ar6_27-subs_150-slsize
+    % RAW_FA_VALS_ar6_subs-150_slsize-27
+    fnToload = sprintf('RAW_FA_VALS_ar6_subs-%d_slsize-%d.mat',...
+        numsubstot(ns),slsize);
+    load(fullfile(resDir,fnToload));
+    rawFA = scoringToMatrix(mask,double(eval(params.measureuse)'),locations); %  SigFDR must be row vector % rawFuA_symmetry % rawFuA_nonCentered
+    rawDir3d = scoringToMatrix(mask,double(drrealdata'),locations); %  SigFDR must be row vector % rawFuA_symmetry % rawFuA_nonCentered
     
-    faControl = eval(sprintf('faEPI3D%.3d',numsubs) );
+    % rawFA = vmp.Map(1).VMPData; % map number 4 is SL size 47
+    rawVals = double(rawFA);
+    %% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+%     load(fullfile(resDir,'FAepiVsRealin3d.mat'));
+%     faControl = eval(sprintf('faEPI3D%.3d',numsubs) );
+    faControl = rawDir3d; %% TEMP to do SL size 9
     rawValsControl = double(faControl); 
     idxsZeroVals = find(rawVals==0);
     % cortical data
@@ -41,11 +62,16 @@ for ns = 1:2
         idxsOfLabel = find(vmpatlas.Map(areaIdxs(j)).VMPData==1);
         idxsOfLabelWithDataFA = setdiff(idxsOfLabel,idxsZeroVals);
         valsInLabel = rawVals(idxsOfLabelWithDataFA);
+        valsInLabel_Dir = rawDir3d( idxsOfLabelWithDataFA);
         faData(j).vals = valsInLabel;
+        faData(j).vals_dir = valsInLabel_Dir;
         faData(j).mean = mean(valsInLabel);
+        faData(j).mean_dir = mean(valsInLabel_Dir);
         faData(j).median = median(valsInLabel);
+        faData(j).median_dir = median(valsInLabel_Dir);
         faData(j).sd = std(valsInLabel);
         faData(j).sem = std(valsInLabel)/sqrt(length(valsInLabel)); % standard error of the mean
+        faData(j).sem_dir = std(valsInLabel_Dir)/sqrt(length(valsInLabel_Dir)); % standard error of the mean
         faData(j).control = rawValsControl(idxsOfLabelWithDataFA);
         faData(j).Means_control = mean(rawValsControl(idxsOfLabelWithDataFA));
         faData(j).Median_control = median(rawValsControl(idxsOfLabelWithDataFA));
@@ -67,11 +93,16 @@ for ns = 1:2
         end
         idxsOfLabelWithDataFA = setdiff(idxsOfLabel,idxsZeroVals);
         valsInLabel = rawVals(idxsOfLabelWithDataFA);
+        valsInLabel_Dir = rawDir3d( idxsOfLabelWithDataFA);
         faData(j).vals = valsInLabel;
+        faData(j).vals_dir = valsInLabel_Dir;
         faData(j).mean = mean(valsInLabel);
+        faData(j).mean_dir = mean(valsInLabel_Dir);
         faData(j).median = median(valsInLabel);
+        faData(j).median_dir = median(valsInLabel_Dir);
         faData(j).sd = std(valsInLabel);
         faData(j).sem = std(valsInLabel)/sqrt(length(valsInLabel)); % standard error of the mean
+        faData(j).sem_dir = std(valsInLabel_Dir)/sqrt(length(valsInLabel_Dir)); % standard error of the mean
         faData(j).control = rawValsControl(idxsOfLabelWithDataFA);
         faData(j).Means_control = mean(rawValsControl(idxsOfLabelWithDataFA));
         faData(j).Median_control = median(rawValsControl(idxsOfLabelWithDataFA));
@@ -79,6 +110,71 @@ for ns = 1:2
     end
     faTable = struct2table(faData);
     
+    %% scatter of measure vs dr real data in all of brain 
+    hfig = figure; 
+    scatter(eval(params.measureuse),drrealdata,0.5);
+    xlabel(getLabel(params.measureuse)); ylabel('Directional M&M');
+    title(sprintf('%s values vs Directional M&M (subs-%d)',...
+        getLabel(params.measureuse),numsubs),'FontSize',10);
+    fnms = sprintf('CORR_measure-%s_subs-%.3d_slsize-%.2d.jpeg',...
+        genvarname(params.measureuse),numsubs,slsize);
+    dirsave = 'D:\Roee_Main_Folder\1_AnalysisFiles\Poldrack_RFX\Publish_Ready_Process\figures\FuA_temp';
+    hfig.PaperPositionMode = 'auto';
+    saveas(hfig,fullfile(dirsave,fnms));
+    xlimsuse = xlim; ylimsuse = ylim;
+    close(hfig); 
+    
+    %% organize data for gramm structure 
+    FuA = []; MandMdir = []; labelidx = []; labelstr = {}; 
+    cm = colormap(parula(20));
+    %figure;
+    %hold on;
+    hfig = figure('visible','on','Position',[428         364        1132         974]);
+    hold on; 
+    for i = 1:size(faTable,1)
+        FuA = [FuA ; faTable.vals{i}];
+        MandMdir = [MandMdir ; faTable.vals_dir{i}];
+        labelstr = [labelstr; repmat(faTable.mapName(i),length(faTable.vals_dir{i}),1)];
+        labelidx = [labelidx; repmat(i,length(faTable.vals_dir{i}),1)];
+        y = faTable.vals_dir{i};
+        subplot(4,3,i);
+        scatter( faTable.vals{i},y, 3,cm(i,:));
+        xlim(xlimsuse); ylim(ylimsuse); 
+        title(faTable.mapName{i},'FontSize',10);
+        
+        xlabel(getLabel(params.measureuse),'FontSize',8); ylabel('Directional M&M','FontSize',8);
+        [rowuse,coluse] = ind2sub([4,3],i+1);
+        g(rowuse,coluse) = gramm('x',faTable.vals{i},'y',y);
+        g(rowuse,coluse).set_names('x',getLabel(params.measureuse),'y','Directional M&M');
+        g(rowuse,coluse).set_title(faTable.mapName{i});
+        g(rowuse,coluse).geom_point();
+        g(rowuse,coluse).facet_grid('scale','fixed')
+        %xlim([0.9 1.16]);
+        title(faTable.mapName{i});
+        regiongname = genvarname(faTable.mapName{i});
+    end
+    suptitle(sprintf('%s vs DR m&m (%.3d subs)',...
+        getLabel(params.measureuse),numsubs));
+    fnms = sprintf('SCATTER_measure-%s_subs-%.3d_slsize-%.2d.jpeg',...
+        genvarname(params.measureuse),numsubs,slsize);
+
+    dirsave = 'D:\Roee_Main_Folder\1_AnalysisFiles\Poldrack_RFX\Publish_Ready_Process\figures\FuA_temp';
+    hfig.PaperPositionMode = 'auto';
+    saveas(hfig,fullfile(dirsave,fnms));
+    close(hfig);
+    
+    labels = faTable.mapName;
+    g = gramm('x',FuA,'y',MandMdir,'color',labelidx); 
+    g.facet_grid([],labelstr,'scale','fixed');
+    g.facet_wrap(labelstr,'ncols',4);
+    % figure;
+    % g.draw;
+    
+    g(1,1).stat_ellipse(); 
+    g(1,1).set_names('x' , getLabel(params.measureuse), 'y', 'MandMDir','Color', 'Regions:');
+    g.set_title([getLabel(params.measureuse) ' vs M&M'],'FontSize',10); 
+%     hfig  = figure;
+%     g.draw;
     %% create bar graphs of all regions:
     means = [faTable.median];
     sem  = [faTable.sem];
@@ -86,7 +182,7 @@ for ns = 1:2
     set(gcf,'Position',[1000         667        1279         671])
     cm = colormap(parula(14));
     for i = 1:size(faTable,1); bar(i,means(i),'FaceColor',cm(i,:));end
-    % ylim([0.15 0.25])
+    ylim([min(means)*0.9 max(means)*1.1])
     set(gca,'XTick',1:size(faTable,1))
     labels = faTable.mapName;
     for i = 1:size(faTable,1); labels{i} = sprintf('%2d. %s',i,labels{i}); end
@@ -94,14 +190,20 @@ for ns = 1:2
     
     errorbar(1:length(faData),means,sem,'.',...
         'LineWidth',2)
-    ylim([0.19 0.27])
-    ylabel('Median FA values');
+    ylabel(getLabel(params.measureuse));
     xlabel('ROI #');
-    title(sprintf('FA values higher in primary auditory regions %d subs',numsubs));
+    title(sprintf('%s values higher in primary auditory regions %d subs',...
+        getLabel(params.measureuse),numsubs));
     
-    figname = fullfile(resDir,sprintf('%s_bar.pdf',filesFA{ns}));
-    printFigToPDFa4(hfig,figname)
+    dirsave = 'D:\Roee_Main_Folder\1_AnalysisFiles\Poldrack_RFX\Publish_Ready_Process\figures\FuA_temp';
+    fnms = sprintf('BAR_measure-%s_subs-%.3d_slsize-%.2d.pdf',...
+        genvarname(params.measureuse),numsubs,slsize);
+    hfig.PaperPositionMode = 'auto';
+    saveas(hfig,fullfile(dirsave,fnms));
+    close(hfig); 
+    % printFigToPDFa4(hfig,figname)
     
+    return ; 
     
     %% create vmp of FA values as % over wm in anatomical regions 
     load(fullfile(resDir,'rawData_ar3_FFX.mat'),'locations','mask');
@@ -317,5 +419,26 @@ for ns = 1:2
     
     figname = fullfile(resDir, sprintf('%s_control_boxplots_as_percent_wm.pdf',filesFA{ns}));
     printFigToPDFa4(hfig,figname)
+end
+end
+
+function label = getLabel(str)
+% rawFuA_nonNormalized , rawFuA_symmetry, rawFuA_unitNormalized, drrealdata
+
+switch str
+    case 'rawFuA_nonNormalized'
+        label = 'FuA Non Unit Normalized';
+    case 'rawFuA_symmetry'
+        label = 'Symmetry Measure';
+    case 'rawFuA_unitNormalized'
+        label = 'FuA Unit Normalized';
+    case 'drrealdata'
+        label = 'Muni Meng Directional';
+    case 'rawFuA_normdiff_unitnorm'
+        label = 'Norm Diff (Unit Normalized)';
+    case 'rawFuA_normdiff_nonunitnorm'
+        label = 'Norm Diff (Non Unit Normalized)';
+    case 'rawFuA_skewness'
+        label = 'Distnace Skewness';
 end
 end

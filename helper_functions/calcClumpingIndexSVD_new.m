@@ -1,4 +1,4 @@
-function clumpIdx = calcClumpingIndexSVD(meanDeltaPerSub,normalize)
+function clumpIdx = calcClumpingIndexSVD_new(meanDeltaPerSub)
 % Option 2 (backup):
 % Here is a new measure of multivariate symmetry, in the spirit of [1] and [2], (with some [3]):
 % The idea is based on the observation that the Wilcoxon signed rank statistic is sensitive to the break of the symetry of a distribution [3].
@@ -21,13 +21,30 @@ function clumpIdx = calcClumpingIndexSVD(meanDeltaPerSub,normalize)
 
 % input data is sphers x subs
 % move to 2 D (27xSubs);
-if normalize
-    meanDeltaPerSub = normc(meanDeltaPerSub);
+if ndims(meanDeltaPerSub>2)
+    meanDeltaPerSub = squeeze(meanDeltaPerSub);
 end
+
+for i = 1:size(meanDeltaPerSub,1)
+    todiv(:,i) = norm(meanDeltaPerSub(i,:));
+end
+meanDeltaPerSub = meanDeltaPerSub ./ repmat(todiv',1,size(meanDeltaPerSub,2));
 
 % take svd of each vector with mean
 [s] = svd(meanDeltaPerSub);
+% from : http://www.ncbi.nlm.nih.gov/pmc/articles/PMC1097734/
+% eq. 4 (C), 10 (A) 
+s_sqrd = s.^2;
+n = length(s);
+m = median(s_sqrd); 
+a = min(s_sqrd); 
+b = max(s_sqrd); 
+% eq. 04: 
+C = (a + 2*m + b)/4 + (a - 2*m + b)/(4*n);
+% eq. 10
+A = a^2+m^2+b^2+((n-3)/2)*( ( (a+m)^2 + (m+b)^2 ) / 4 );
 % clumpIdx = var(s);
-clumpIdx = sqrt(3/2)* sqrt( sum( (s.^2-mean(s.^2)).^2 ) / sum(s.^4)) ;
+clumpIdx = sqrt(3/2)* sqrt( 1 -  (n * (C^2))/A );
+
 
 end
