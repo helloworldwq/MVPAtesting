@@ -3,14 +3,14 @@ numsubs = [20,150];
 alpha = 0.05;
 printvmp = 0;
 %% params set
-params.slsize       = 27; % searchlight size to use
+params.slsize       = 9; % searchlight size to use
 params.usetop100    = 0; % use top 100 voxels from D / ND analysis
 params.use20regin   = 0;  % use the regions from 20 subjects to compute FuA in 150 subjects
-params.measureuse   = 'rawFuA_skewness';% which symmetry measure to use (FuA unit normed, FuA non unit normed, Symmetry, directioanl multi-t)
+params.measureuse   = 'drrealdata';% which symmetry measure to use (FuA unit normed, FuA non unit normed, Symmetry, directioanl multi-t)
 % rawFuA_nonNormalized , rawFuA_symmetry, rawFuA_unitNormalized, rawFuA_skewness
 % drrealdata, rawFuA_normdiff_unitnorm, rawFuA_normdiff_nonunitnorm
-params.withcommn    = 1; % 'D only'; % D only or D + common in comparison
-params.printvmp     = 0; % print vmp with results
+params.withcommn    = 0; % 'D only'; % D only or D + common in comparison
+params.printvmp     = 1; % print vmp with results
 params.figfold      = fullfile('..','..','figures','FuA_temp');
 params.useshuf      = 0; % use shuffle data
 slsize = params.slsize;
@@ -137,7 +137,7 @@ fnsvefig = sprintf('DvsND_slsize-%d_ust100-%d_use20r-%d_mesure-%s_comm-%d_shuf-%
     params.slsize,params.usetop100,params.use20regin,params.measureuse,params.withcommn,params.useshuf);
 hfig.PaperPositionMode = 'auto';
 saveas(hfig,fullfile(params.figfold,fnsvefig));
-close(hfig);
+% close(hfig);
 % fns = fullfile(fullfile(rootDir,'result_figs','D-only_v_ND-only_20_subs_matlab_histogram.pdf'));
 % printFigToPDFa4(hfig,fns)
 end

@@ -120,6 +120,7 @@ for ns = 1
         genvarname(params.measureuse),numsubs,slsize);
     dirsave = 'D:\Roee_Main_Folder\1_AnalysisFiles\Poldrack_RFX\Publish_Ready_Process\figures\FuA_temp';
     hfig.PaperPositionMode = 'auto';
+    hfig.PaperOrientation = 'landscape';
     saveas(hfig,fullfile(dirsave,fnms));
     xlimsuse = xlim; ylimsuse = ylim;
     close(hfig); 
@@ -192,14 +193,40 @@ for ns = 1
         'LineWidth',2)
     ylabel(getLabel(params.measureuse));
     xlabel('ROI #');
-    title(sprintf('%s values higher in primary auditory regions %d subs',...
+    title(sprintf('%s values higher in auditory regions (%d)',...
         getLabel(params.measureuse),numsubs));
     
     dirsave = 'D:\Roee_Main_Folder\1_AnalysisFiles\Poldrack_RFX\Publish_Ready_Process\figures\FuA_temp';
     fnms = sprintf('BAR_measure-%s_subs-%.3d_slsize-%.2d.pdf',...
         genvarname(params.measureuse),numsubs,slsize);
-    hfig.PaperPositionMode = 'auto';
+    legend(gca,'off'); 
+    hfig.PaperPositionMode = 'manual';
+    hfig.PaperOrientation = 'landscape';
+    set(gca,'FontSize',10);
+    hfig.PaperType = 'a4';
+    hfig.PaperUnits = 'normalized';
+    hfig.PaperPosition = [0.01 0.01 0.3 0.3];
+    set(findall(hfig,'-property','Font'),'Font','Arial')
     saveas(hfig,fullfile(dirsave,fnms));
+    
+    fnms = sprintf('BAR2_measure-%s_subs-%.3d_slsize-%.2d.pdf',...
+        genvarname(params.measureuse),numsubs,slsize);
+    g = gramm('x',labelidx,'y',FuA,'color',labelidx);
+    g.set_names('x','ROI #','y','SD Directional','Color','Regions');
+    g.set_title(sprintf('%s values higher in auditory regions (%d)',...
+        getLabel(params.measureuse),numsubs));
+    g.stat_boxplot('notch',true,'dodge',0.2,'width',6);
+%     g.stat_violin('kernel','normal','normalization','width','width',6)
+    hfig = figure('Position',[1000 874 784 464]); g.draw;
+       hfig.PaperPositionMode = 'manual';
+    hfig.PaperOrientation = 'landscape';
+    set(gca,'FontSize',10);
+    hfig.PaperType = 'a4';
+    hfig.PaperUnits = 'normalized';
+    hfig.PaperPosition = [0.01 0.01 0.3 0.3];
+    set(findall(hfig,'-property','Font'),'Font','Arial')
+    saveas(hfig,fullfile(dirsave,fnms));
+    
     close(hfig); 
     % printFigToPDFa4(hfig,figname)
     
