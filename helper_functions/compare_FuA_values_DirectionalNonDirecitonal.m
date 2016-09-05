@@ -1,15 +1,17 @@
 function compare_FuA_values_DirectionalNonDirecitonal()
 numsubs = [20,150];
+numsubs = 20;
 alpha = 0.05;
 printvmp = 0;
 %% params set
-params.slsize       = 9; % searchlight size to use
+params.slsize       = 27; % searchlight size to use
 params.usetop100    = 0; % use top 100 voxels from D / ND analysis
 params.use20regin   = 0;  % use the regions from 20 subjects to compute FuA in 150 subjects
-params.measureuse   = 'drrealdata';% which symmetry measure to use (FuA unit normed, FuA non unit normed, Symmetry, directioanl multi-t)
+params.measureuse   = 'ndrrrealdata';% which symmetry measure to use (FuA unit normed, FuA non unit normed, Symmetry, directioanl multi-t)
 % rawFuA_nonNormalized , rawFuA_symmetry, rawFuA_unitNormalized, rawFuA_skewness
-% drrealdata, rawFuA_normdiff_unitnorm, rawFuA_normdiff_nonunitnorm
-params.withcommn    = 0; % 'D only'; % D only or D + common in comparison
+% drrealdata, rawFuA_normdiff_unitnorm, rawFuA_normdiff_nonunitnorm,real_acc_DR_svm_linear
+% real_acc_ND_svm_linear, ndrrrealdata
+params.withcommn    = 1; % 'D only'; % D only or D + common in comparison
 params.printvmp     = 1; % print vmp with results
 params.figfold      = fullfile('..','..','figures','FuA_temp');
 params.useshuf      = 0; % use shuffle data
@@ -29,7 +31,8 @@ for i = 1:length(numsubs)
     rootDir2ndlvl = fullfile('..','..','results',sprintf('results_VocalDataSet_FIR_AR6_FFX_ND_norm_400-shuf_SLsize-%d',slsize),'2nd_level');
     %% directional
     dirfnm  = sprintf('results_DR_shufs-5000_subs-%d_slsize-%d.mat',numsubs(i),slsize);
-    load(fullfile(rootDir2ndlvl,dirfnm),'pval','mask','locations','drrealdata');
+    load(fullfile(rootDir2ndlvl,dirfnm),'pval','mask','locations','drrealdata','real_acc_DR_svm_linear');
+    real_acc_DR_svm_linear = real_acc_DR_svm_linear';
     sigfdr = fdr_bh(pval,alpha,'pdep','yes');
     idxdir = find(sigfdr==1);
     if params.usetop100 % Take only top 100 dir idxs
@@ -38,8 +41,9 @@ for i = 1:length(numsubs)
     end
     %% non directional
     ndrfnm  = sprintf('ND_FFX_VDS_%d-subs_%d-slsze_1-fld_400shufs_5000-stlzer_mode-equal-min_newT2013.mat',numsubs(i),slsize);
-    load(fullfile(rootDir2ndlvl,ndrfnm),'pval','mask','locations','ndrrrealdata')
+    load(fullfile(rootDir2ndlvl,ndrfnm),'pval','mask','locations','ndrrrealdata','real_acc_ND_svm_linear')
     sigfdr = fdr_bh(pval,alpha,'pdep','yes');
+    real_acc_ND_svm_linear = real_acc_ND_svm_linear';
     idxndr = find(sigfdr==1);
     if params.usetop100 % Take only top 100 dir idxs
         [vals ixs] = sort(ndrrrealdata(idxndr));
@@ -97,6 +101,7 @@ for i = 1:length(numsubs)
             vmp.Map(m).LowerThreshold = minmaps;
             vmp.Map(m).UpperThreshold = maxmaps;
             vmp.Map(m).UseRGBColor = 0;
+            vmp.Map(m).LUTName = 'RoeeCmap2.olt';
         end
         vmp.NrOfMaps = 3;
         msruse = genvarname(getLabel(params.measureuse));
@@ -160,5 +165,11 @@ switch str
         label = 'Norm Diff (Non Unit Normalized)';
     case 'rawFuA_skewness'
         label = 'Distnace Skewness';
+    case 'ndrrrealdata'
+        label = 'Non-directional real data';
+    case 'real_acc_ND_svm_linear'
+        label = 'Accuracy Non-Directional Linear SVM - 5fold CV';
+    case 'real_acc_DR_svm_linear'
+        label = 'Accuracy Directional Linear SVM - 5fold CV';
 end
 end

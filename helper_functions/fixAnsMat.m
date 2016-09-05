@@ -4,27 +4,39 @@ function fixedAnsMat = fixAnsMat(ansMat,locations,mode)
 % the real data shuffle
 fixedAnsMat = [];
 %% find problem areas and report them:
-idxNans = find(isnan(median(ansMat,2))==1);% median on nan gives NaN...
-if isempty(idxNans) 
-    fprintf('\t no bad voxels\n');
-    fixedAnsMat = ansMat;
-    return 
-end
-%         ansMat(idxNans,:) = 0;
-ct =1; idxnan =[];
-for k = 1:size(ansMat,1); % loop on voxels
-    tmp = ansMat(k,:);
-    if  length(find(isnan(tmp)==1)) > 0
-        idxnan(ct, 1) = k;
-        idxnan(ct, 2) = length(find(isnan(tmp)==1)) ;
-        ct = ct + 1;
-    end
-end
 
-fprintf('\t %d bad voxels, %d oneshuf, %d all shufs\n',...
-    size(idxnan,1),...
-    length(find(idxnan(:,2) == 1)),...
-    length(find(idxnan(:,2) == size(ansMat,2))))
+% nan's that exist in all shuffels + real 
+nanAnsMat = isnan(ansMat); 
+idxnans_voxels = find(sum(nanAnsMat,2) == size(ansMat,2));
+tmprows = repmat(idxnans_voxels,401,1);
+tmpcols = []; 
+for i = 1:size(nanAnsMat,2) 
+    tmpcols = [tmpcols ; ones(length(idxnans_voxels),1)*i];
+end 
+idxs_linear_all_shufs =  sub2ind(size(nanAnsMat),tmprows,tmpcols);
+% nan's that exist only in ALL shuffels 
+idxnans_shufs = find(sum(nanAnsMat(:,2:end),2) == size(ansMat,2)-1);
+idxshuf_only  = setdiff(idxnans_shufs,idxnans_voxels);
+% nan's that exist only in real but not in all shuffels 
+idxnans_real_all = find(nanAnsMat(:,1) == 1);
+idxnans_real_only = setdiff(idxnans_real_all,idxnans_voxels);
+idxnans_real_only_linear = sub2ind(size(nanAnsMat),idxnans_real_only,...
+    repmat(1,length(idxnans_real_only),1));
+[idxrows_real_only, idxcolums_real_only] = ind2sub(size(nanAnsMat),idxnans_real_only_linear);
+% nan's that exist only in some shufs 
+idx_all_nans_linear = find(nanAnsMat == 1);
+idx_linear_exist_only_some_shuf = setdiff(idx_all_nans_linear,idxs_linear_all_shufs);
+idxrows_somshuf = setxor(idxnans_voxels,1:size(nanAnsMat,1)); 
+[idxrows, idxcolums] = ind2sub(size(nanAnsMat),idx_linear_exist_only_some_shuf);
+% expected total nans' 
+fprintf('\t %d nans all shufs, %d unq voxels, %d unq shufs, %d real only %d expected %d found\n',...
+    length(idxnans_voxels),...
+    length(unique(idxrows)),...
+    length(unique(idxcolums)),...
+    length(idxnans_real_only),...
+    length(idxnans_voxels)*size(ansMat,2) + size(idxrows,1),...
+    sum(nanAnsMat(:)));
+
 
 %% fix the problem
 % mode = 'equal-zero';
@@ -32,7 +44,7 @@ fprintf('\t %d bad voxels, %d oneshuf, %d all shufs\n',...
 % mode = 'weight';
 
 fixedAnsMat = ansMat;
-idxnbrs = knnsearch(locations, locations, 'K', 10); % will take the 10 closest non nan vals
+%idxnbrs = knnsearch(locations, locations, 'K', 10); % will take the 10 closest non nan vals
 switch mode
     case 'equal-zero'
         fixedAnsMat(idxnan(:,1),:) = 0; % this creats the same value for all shuffels
@@ -60,4 +72,19 @@ switch mode
     case 'anatomical'
         fixedAnsMat = ansMat; 
         fixedAnsMat(isnan(ansMat)) = min(ansMat(:));
+    case 'new-weight' % tailor version:
+        % if nan's in all voxels they all get zero 
+        if ~isempty(idxnans_voxels)
+            fixedAnsMat(idxnans_voxels,:) = 0;
+        end
+        % if unique voxels only in shuffle get average shuff from that voxels  
+        if ~isempty(idxrows)
+            fixedAnsMat(idx_linear_exist_only_some_shuf) = nanmean(fixedAnsMat(idxrows,2:end),2);
+        end
+        % shuf only exists in real -give it max value of shuf 
+        if ~isempty(idxnans_real_only_linear)
+            fixedAnsMat(idxnans_real_only_linear) = nanmax(fixedAnsMat(idxrows_real_only,2:end),[],2);
+        end
 end
+
+end 

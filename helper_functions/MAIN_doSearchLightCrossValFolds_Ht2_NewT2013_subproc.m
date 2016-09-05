@@ -1,18 +1,20 @@
 function MAIN_doSearchLightCrossValFolds_Ht2_NewT2013_subproc(subnum)
-% get params 
-p = genpath(pwd);
-addpath(p); 
-params = get_and_set_params();
-% load data / file naming / saving 
-datadir = fullfile('..','..','data','stats_normalized_sep_beta_FIR_ar6'); 
-fn = sprintf('data_%.3d.mat',subnum);
+%% set path 
+addpath(genpath(pwd));
+cd('helper_functions'); 
+[params, settings] = get_and_set_params();
+%% load data / file naming / saving vocal 
+datadir = settings.datadir;
+fn = sprintf(settings.fnsearchstr,subnum);
 load(fullfile(datadir,fn));
-fnTosave = sprintf('results_VocalDataSet_FFX_ND_norm_%d-shuf_SLsize-%d_sub_-%.3d_',...
-                    params.numShuffels,params.regionSize,subnum);
-resultsdir = fullfile('..','results'); 
-resultsDirName = fullfile(resultsdir,sprintf('results_VocalDataSet_FIR_AR6_FFX_ND_norm_%d-shuf_SLsize-%d',...
-                            params.numShuffels,params.regionSize));
+fnTosave = sprintf('%s%d-shuf_SLsize-%d_sub_-%.3d_',...
+    settings.resprefix,params.numShuffels,params.regionSize,subnum);
+
+resultsdir = fullfile('..','..','results');
+resultsDirName = fullfile(resultsdir,sprintf('%s%d-shuf_SLsize-%d',...
+    settings.resfoldprefix,params.numShuffels,params.regionSize));
 mkdir(resultsDirName);
+
 % pre compute values 
 start = tic;
 idx = knnsearch(locations, locations, 'K', params.regionSize); % find searchlight neighbours 
@@ -38,4 +40,11 @@ end
 fnOut = [fnTosave datestr(clock,30) '_.mat'];
 save(fullfile(resultsDirName,fnOut));
 msgtitle = sprintf('Finished sub %.3d ',subnum);
+
+%% push message that finished subject 
+p = Pushbullet(settings.pushbullettok);
+secsjobtook = toc(start);
+durjob = sprintf('job took: %s',datestr(secsjobtook/86400, 'HH:MM:SS.FFF'));
+p.pushNote([],'Finished Subject ',[msgtitle  fnOut])
+
 end

@@ -1,5 +1,5 @@
 function plotVMPsDirectionalVsNondirectionalFFX_SVM_vs_MultiT()
-p= genpath('D:\Roee_Main_Folder\1_AnalysisFiles\Poldrack_RFX');addpath(p);
+%p= genpath('D:\Roee_Main_Folder\1_AnalysisFiles\Poldrack_RFX');addpath(p);
 n = neuroelf;
 % load sample example MNI .nii
 vmp = BVQXfile(fullfile(pwd,'blank_MNI_3x3res.vmp'));
@@ -15,9 +15,21 @@ for i = 1:length(ffldrs)
 end
 
 % folders to analyize
-idxuse =  10 ; % folder to choose 
+idxuse =  11 ; % folder to choose 
 
+%% load non CV multi-t
+fldrusemt = fullfile(ffldrs{4},'2nd_level');
+fnmtnocv = 'ND_FFX_VDS_20-subs_27-slsze_1-fld_400shufs_5000-stlzer_mode-equal-min_newT2013.mat';
+fnmdr = 'results_DR_shufs-5000_subs-20_slsize-27.mat';
+load(fullfile(fldrusemt,fnmtnocv),'pval');
+sigfdr_nd = fdr_bh(pval,0.05,'pdep','yes');
+load(fullfile(fldrusemt,fnmdr),'pval');
+sigfdr_dr = fdr_bh(pval,0.05,'pdep','yes');
 
+idxmultit_nocv_dr = find(sigfdr_dr==1); 
+idxmultit_nocv_nd = find(sigfdr_nd==1); 
+idxMultiT_nocv = unique([find(sigfdr_nd==1), find(sigfdr_dr==1)]);
+%% 
 % loop
 vmp = BVQXfile(fullfile(pwd,'blank_MNI_3x3res.vmp'));
 %vmp = n.importvmpfromspms(fullfile(pwd,'blank_MNI_3x3res.nii'),'a',[],3);
@@ -94,6 +106,42 @@ percent_ndr_mt = sum(ismember(idx_ndr_multit,idx_ndr_svm))/length(idx_ndr_svm);
 percent_dr_mt = sum(ismember(idx_dr_multit,idx_dr_svm))/length(idx_dr_svm);
 fprintf('ND: multi-t finds %%%.1f of svm voxels\n',percent_ndr_mt*100);
 fprintf('DR: multi-t finds %%%.1f of svm voxels\n',percent_dr_mt*100);
+
+multitidx = unique([idx_ndr_multit, idx_dr_multit]);
+svm_idx = unique([idx_ndr_svm, idx_dr_svm]);
+percent_mt_svm = sum(ismember(multitidx,svm_idx))/length(svm_idx);
+fprintf('overall: multi-t finds %%%.1f of svm voxels\n',percent_mt_svm*100);
+
+percent_svm_mt = sum(ismember(svm_idx,multitidx))/length(multitidx);
+fprintf('overall: svm finds %%%.1f of multit voxels\n',percent_svm_mt*100);
+%% multi t no cv report 
+% svm 
+percent_svm_mt = sum(ismember(svm_idx,idxMultiT_nocv))/length(idxMultiT_nocv);
+fprintf('overall: svm finds %%%.1f of multit voxels\n',percent_svm_mt*100);
+percent_svm_mt = 1-sum(ismember(idxMultiT_nocv,svm_idx))/length(svm_idx);
+fprintf('overall: only %%%.1f of SVM voxels were not found by multi-t\n',percent_svm_mt*100);
+% multi -t 
+percent_svm_mt = sum(ismember(idxMultiT_nocv,svm_idx))/length(svm_idx);
+fprintf('overall: multit finds %%%.1f of svm voxels\n',percent_svm_mt*100);
+percent_svm_mt = 1-sum(ismember(svm_idx,idxMultiT_nocv))/length(idxMultiT_nocv);
+fprintf('overall: only %%%.1f of multi-t voxels were not found by svm-t\n',percent_svm_mt*100);
+
+%% report no cv vs multi-t Roy new version 
+% directional 
+percent_svm_mt = sum(ismember(idxmultit_nocv_dr,idx_dr_svm))/length(idx_dr_svm);
+fprintf('overall DR: multit finds %%%.1f of svm voxels\n',percent_svm_mt*100);
+percent_svm_mt = sum(ismember(idx_dr_svm,idxmultit_nocv_dr))/length(idxmultit_nocv_dr);
+fprintf('overall DR: svm finds %%%.1f of multit voxels\n',percent_svm_mt*100);
+% non directioal 
+percent_svm_mt = sum(ismember(idxmultit_nocv_nd,idx_ndr_svm))/length(idx_ndr_svm);
+fprintf('overall ND: multit finds %%%.1f of svm voxels\n',percent_svm_mt*100);
+percent_svm_mt = sum(ismember(idx_ndr_svm,idxmultit_nocv_nd))/length(idxmultit_nocv_nd);
+fprintf('overall ND: svm finds %%%.1f of multit voxels\n',percent_svm_mt*100);
+
+% idxmultit_nocv_dr = find(sigfdr_dr==1); 
+% idxmultit_nocv_nd = find(sigfdr_nd==1); 
+
+%% 
 vmp.SaveAs(fullfile(rootDir,vmpfn));
 vmp.ClearObject;
 clear vmp;
