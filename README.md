@@ -1,4 +1,4 @@
-Quantifying spatial pattern similarity in multivariate analysis using functional anisotropy
+What's in a pattern? Examining the type of signal multivariate analysis uncovers at the group level
 ==============
 Overview 
 --------------
